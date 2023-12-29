@@ -86,8 +86,8 @@ const BookGet = (props) => {
                                 }}
                             />
                         </div>
-                        <div className="card-details text-center pt-3">
-                            <h6 className="m-0 pb-3"> {title && title}</h6>
+                        <div className="card-details text-center pt-3 d-flex align-items-center">
+                            <h6 className="m-0 pb-3 d-flex align-items-center"> {title && title}</h6>
                         </div>
                         <div className="card-desc-box d-flex flex-column align-items-center justify-content-around">
                             <div

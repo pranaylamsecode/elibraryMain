@@ -10999,6 +10999,8 @@ body.sidebar-open:before {
     height: 100%;
     justify-content: flex-start;
     align-items: center;
+    display: flex;
+    flex-direction: column;
 }
 
 .case-studies .color-cards .card-details p {
@@ -16854,9 +16856,7 @@ body .table-responsive {
 .frontend .card.color-cards {
     border: 0px !important;
 }
-body.frontend .card-contents .card-details {
-    height: auto !important;
-}
+
 #books-section .search-bar {
     height: auto !important;
 }

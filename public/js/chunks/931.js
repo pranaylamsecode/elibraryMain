@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[931],{4931:function(e,n,r){r.r(n);var a=r(67294),s=r(45697),t=r.n(s),l=r(48521),o=function(e){var n=e.appName;return(0,l.jsx)(l.Fragment,{children:(0,l.jsx)("div",{children:(0,l.jsxs)("span",{className:"ms-1",children:["Developed by VeerIT © ",(new Date).getFullYear()," ",(0,l.jsx)("a",{target:"_blank",rel:"noopener noreferrer",className:"text-decoration-none footer-link",children:n})]})})})};o.propTypes={appName:t().string},n.default=a.memo(o)}}]);
+//# sourceMappingURL=931.js.map

@@ -1,53 +1,82 @@
 import React, { useEffect, useState, Suspense, useCallback } from "react";
 import { useRef } from "react";
-
+import axios from "axios";
 import { useLocation, useNavigate } from "react-router";
-import { connect, useDispatch } from "react-redux";
 
-// import { fetchBooks } from "../../admin/store/actions/bookAction";
-import {
-    fetchBooksAll,
-    fetchBooksByNameOrAuthors,
-    fetchSingleBook,
-} from "../../member/store/actions/bookAction";
-import BookDetails from "./BookModal";
 import { getCurrentMember } from "../../shared/sharedMethod";
-import { ReactSearchAutocomplete } from "react-search-autocomplete";
 import ProgressBar from "../../shared/progress-bar/ProgressBar";
-import { fetchAuthorsWithoutToken } from "../../member/store/actions/authorAction";
-import { findBooksWithout } from "../../member/store/actions/bookSearchAction";
-
-import { fetchGenresWithout } from "../../admin/store/actions/genreAction";
 import Header from "./Header";
 import Footer from "./Footer";
+import defaultBook from "../../../src/assets/images/defaultBook.png";
 
 const Staff = (props) => {
-    const { books, goTo, findBooksWithout } = props;
-    const handleDetails = (id, library_id, format) => {
-        // findBooksWithout(
-        //     "id=" + id + "&search_by_book=" + true + "&library_id=" + library_id
-        // );
-        // goTo("/search/staff/" + id + "/" + library_id);
-        if (format && format === 3) {
-            goTo("/ebook-details/" + id + "/" + library_id);
-            window.scroll({ top: 0, behavior: "smooth" });
+    if (
+        window.location.origin.toString() ==
+        "https://dindayalupadhyay.smartcitylibrary.com"
+    ) {
+        var current_library_id = 111;
+    } else if (
+        window.location.origin.toString() ==
+        "https://kundanlalgupta.smartcitylibrary.com"
+    ) {
+        var current_library_id = 222;
+    } else if (
+        window.location.origin.toString() ==
+        "https://rashtramatakasturba.smartcitylibrary.com"
+    ) {
+        var current_library_id = 333;
+    } else {
+        var current_library_id = 111;
+    }
+
+    const [isLoading, setIsLoading] = useState(false);
+
+    const [prevLimit, setPrevLimit] = useState(10);
+    const [prevSkip, setPrevSkip] = useState(0);
+    const [details, setDetails] = useState([]);
+    const [formgenre, setformGenre] = useState("");
+    const [formauthors, setformauthors] = useState("");
+    const [formpublishers, setformpublishers] = useState("");
+    const [formlanguages, setformlanguages] = useState(0);
+    const [formformats, setformformats] = useState(0);
+    const [formlibrary_id, setLibraryId] = useState(current_library_id);
+    const [term, setTerm] = useState("");
+    const navigate = useNavigate();
+    const handleDetails = (previewLink) => {
+        if (previewLink == "111") {
+            var site_name_image_path = `https://dindayalupadhyay.smartcitylibrary.com`;
+        } else if (previewLink == "222") {
+            var site_name_image_path = `https://kundanlalgupta.smartcitylibrary.com`;
         } else {
-            goTo(
-                "/search/book&" +
-                    name.replaceAll(" ", "") +
-                    "/" +
-                    id +
-                    "/" +
-                    library_id
-            );
-            window.scroll({ top: 0, behavior: "smooth" });
+            var site_name_image_path = `https://rashtramatakasturba.smartcitylibrary.com`;
         }
+
+        window.location.href = site_name_image_path;
     };
+
+    useEffect(() => {
+        const fetchDetails = async () => {
+            setIsLoading(true);
+            /* setPrevLimit(10);
+            setPrevSkip(0); */
+
+            const resources = await axios.get(
+                `${window.location.origin.toString()}/api/v1/books?order_by=created_at&limit=4&search=${term}&genre=${formgenre}&library_id=${formlibrary_id}&author=${formauthors}&publisher=${formpublishers}&language=${formlanguages}&format=${formformats}`
+            );
+
+            setDetails(resources.data.data);
+            setIsLoading(false);
+        };
+        fetchDetails();
+    }, []);
 
     return (
         <section className="case-studies">
             <div className="container">
-                <div className="row grid-margin">
+                <div
+                    className="row grid-margin"
+                    /*  onClick={() => handleDetails(previewLink)} */
+                >
                     <div className="col-12 text-center common-heading pb-5">
                         <h2
                             style={{
@@ -59,8 +88,16 @@ const Staff = (props) => {
                         </h2>
                         <div className="section-divider divider-traingle"></div>
                     </div>
-                    {books &&
-                        books.reverse().map((book, i) => {
+                    {details.length !== 0 ? (
+                        details.slice(0, 4).map((book, i) => {
+                            if (book.library_id == "111") {
+                                var site_name_image_path = `https://dindayalupadhyay.smartcitylibrary.com/uploads/books/thumbnail/${book.image}`;
+                            } else if (book.library_id == "222") {
+                                var site_name_image_path = `https://kundanlalgupta.smartcitylibrary.com/uploads/books/thumbnail/${book.image}`;
+                            } else {
+                                var site_name_image_path = `https://rashtramatakasturba.smartcitylibrary.com/uploads/books/thumbnail/${book.image}`;
+                            }
+
                             return (
                                 <div
                                     key={i}
@@ -76,32 +113,28 @@ const Staff = (props) => {
                                                 }}
                                                 onClick={() =>
                                                     handleDetails(
-                                                        book.id,
-                                                        book.library_id,
-                                                        book.items.length &&
-                                                            book.items[0].format
+                                                        `${book.library_id}`
                                                     )
                                                 }
                                             >
                                                 <div className="card-image">
                                                     <img
-                                                        // src="images/Group95.svg"
                                                         loading="lazy"
                                                         src={
-                                                            book.image_path
-                                                                ? book.image_path
-                                                                : "https://cdn-icons-png.flaticon.com/512/3845/3845824.png"
+                                                            site_name_image_path
+                                                                ? site_name_image_path
+                                                                : defaultBook
                                                         }
+                                                        className="case-studies-card-img"
+                                                        alt=""
                                                         onError={({
                                                             currentTarget,
                                                         }) => {
                                                             currentTarget.onerror =
                                                                 null; // prevents looping
                                                             currentTarget.src =
-                                                                "https://cdn-icons-png.flaticon.com/512/3845/3845824.png";
+                                                                defaultBook;
                                                         }}
-                                                        className="case-studies-card-img"
-                                                        alt=""
                                                     />
                                                 </div>
                                                 <div className="card-details text-center pt-4">
@@ -110,12 +143,6 @@ const Staff = (props) => {
                                                             ? book.name
                                                             : "NA"}
                                                     </h6>
-                                                    {/* <h5 className="text-success">
-                                                    ₹{" "}
-                                                    {book.items
-                                                        ? book.items[0].price
-                                                        : "NA"}
-                                                </h5> */}
                                                 </div>
 
                                                 <div className="card-desc-box d-flex align-items-center justify-content-around">
@@ -135,39 +162,14 @@ const Staff = (props) => {
                                                                     ? "E-Book"
                                                                     : "Book"}
                                                             </span>
-
-                                                            {/* {book?.library_id ===
-                                                            111 ? (
-                                                                <span className="badge badge-success">
-                                                                    L1
-                                                                </span>
-                                                            ) : book?.library_id ===
-                                                              222 ? (
-                                                                <span className="badge badge-danger">
-                                                                    L2
-                                                                </span>
-                                                            ) : (
-                                                                <span className="badge badge-primary">
-                                                                    L3
-                                                                </span>
-                                                            )} */}
                                                         </div>
                                                     </div>
                                                     <div>
-                                                        {/* <h6 className="text-white pb-2 px-3">
-                                                            Know more about the Book
-                                                        </h6> */}
                                                         <button
                                                             className="btn btn-white frontend-btn"
                                                             onClick={() =>
                                                                 handleDetails(
-                                                                    book.id,
-                                                                    book.library_id,
-                                                                    book.items
-                                                                        .length &&
-                                                                        book
-                                                                            .items[0]
-                                                                            .format
+                                                                    `${book.library_id}`
                                                                 )
                                                             }
                                                         >
@@ -182,7 +184,12 @@ const Staff = (props) => {
                                     </div>
                                 </div>
                             );
-                        })}
+                        })
+                    ) : (
+                        <div className="spinner">
+                            <img src="/public/images/301.gif" />
+                        </div>
+                    )}
                 </div>
             </div>
         </section>
@@ -293,319 +300,259 @@ const InfoSection = () => {
 };
 
 const Trending = (props) => {
-    const { books, goTo, findBooksWithout } = props;
+    if (
+        window.location.origin.toString() ==
+        "https://dindayalupadhyay.smartcitylibrary.com"
+    ) {
+        var current_library_id = 111;
+    } else if (
+        window.location.origin.toString() ==
+        "https://kundanlalgupta.smartcitylibrary.com"
+    ) {
+        var current_library_id = 222;
+    } else if (
+        window.location.origin.toString() ==
+        "https://rashtramatakasturba.smartcitylibrary.com"
+    ) {
+        var current_library_id = 333;
+    } else {
+        var current_library_id = 111;
+    }
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleDetails = (id, library_id, format) => {
-        // findBooksWithout(
-        //     "id=" + id + "&search_by_book=" + true + "&library_id=" + library_id
-        // );
-        // goTo("/search/trending/" + id + "/" + library_id);
-        if (format && format === 3) {
-            goTo("/ebook-details/" + id + "/" + library_id);
-            window.scroll({ top: 0, behavior: "smooth" });
+    const [prevLimit, setPrevLimit] = useState(10);
+    const [prevSkip, setPrevSkip] = useState(0);
+    const [details, setDetails] = useState([]);
+    const [formgenre, setformGenre] = useState("");
+    const [formauthors, setformauthors] = useState("");
+    const [formpublishers, setformpublishers] = useState("");
+    const [formlanguages, setformlanguages] = useState(0);
+    const [formformats, setformformats] = useState(0);
+    const [formlibrary_id, setLibraryId] = useState(current_library_id);
+    const [term, setTerm] = useState("");
+    const navigate = useNavigate();
+    /*  const handleDetails = (previewLink) => {
+        navigate("/search/book&" + previewLink);
+    }; */
+
+    const handleDetails = (previewLink) => {
+        if (previewLink == "111") {
+            var site_name_image_path = `https://dindayalupadhyay.smartcitylibrary.com`;
+        } else if (previewLink == "222") {
+            var site_name_image_path = `https://kundanlalgupta.smartcitylibrary.com`;
         } else {
-            goTo(
-                "/search/book&" +
-                    name.replaceAll(" ", "") +
-                    "/" +
-                    id +
-                    "/" +
-                    library_id
-            );
-            window.scroll({ top: 0, behavior: "smooth" });
+            var site_name_image_path = `https://rashtramatakasturba.smartcitylibrary.com`;
         }
+
+        window.location.href = site_name_image_path;
     };
+
+    useEffect(() => {
+        const fetchDetails = async () => {
+            setIsLoading(true);
+
+            const resources = await axios.get(
+                `${window.location.origin.toString()}/api/v1/books?order_by=created_at&limit=4&search=${term}&genre=${formgenre}&library_id=${formlibrary_id}&author=${formauthors}&publisher=${formpublishers}&language=${formlanguages}&format=${1}&for_featured_books=true`
+            );
+
+            setDetails(resources.data.data);
+            setIsLoading(false);
+        };
+        fetchDetails();
+    }, []);
     return (
         <section className="case-studies" id="trending-section">
-            <div className="container">
-                <div className="row grid-margin">
-                    <div className="col-12 text-center common-heading pb-5">
-                        <h2
-                            style={{
-                                fontSize: "3rem",
-                                fontFamily: "Philosopher",
-                            }}
-                        >
-                            Featured Books
-                        </h2>
-                        <div className="section-divider divider-traingle"></div>
-                        {/* <h6 className="section-subtitle text-muted">
-                            Lorem ipsum dolor sit amet, tincidunt vestibulum.
-                        </h6> */}
-                    </div>
-                    {books.length &&
-                        books.map((book, i) => {
-                            return (
-                                <div
-                                    key={i}
-                                    className="col-12 col-md-6 col-lg-3 stretch-card mb-3 mb-lg-0"
-                                    data-aos="zoom-in"
-                                >
-                                    <div className="card color-cards">
-                                        <div className="card-body p-0">
-                                            <div
-                                                className="text-center card-contents"
-                                                style={{
-                                                    backgroundColor: "#f2f2f2",
-                                                }}
-                                                onClick={() =>
-                                                    handleDetails(
-                                                        book.id,
-                                                        book.library_id,
-                                                        book.items.length &&
-                                                            book.items[0].format
-                                                    )
-                                                }
-                                            >
-                                                <div className="card-image">
-                                                    <img
-                                                        // src="images/Group95.svg"
-                                                        loading="lazy"
-                                                        src={
-                                                            book.image_path
-                                                                ? book.image_path
-                                                                : "https://cdn-icons-png.flaticon.com/512/3845/3845824.png"
-                                                        }
-                                                        className="case-studies-card-img"
-                                                        alt=""
-                                                        onError={({
-                                                            currentTarget,
-                                                        }) => {
-                                                            currentTarget.onerror =
-                                                                null; // prevents looping
-                                                            currentTarget.src =
-                                                                "https://cdn-icons-png.flaticon.com/512/3845/3845824.png";
-                                                        }}
-                                                    />
-                                                </div>
-                                                <div className="card-details text-center pt-4">
-                                                    <h6 className="m-0 pb-1">
-                                                        {book.name
-                                                            ? book.name
-                                                            : "NA"}
-                                                    </h6>
-                                                    {/* <h5 className="text-success">
-                                                    ₹{" "}
-                                                    {book.items
-                                                        ? book.items[0].price
-                                                        : "NA"}
-                                                </h5> */}
-                                                </div>
+            {details.length !== 0 ? (
+                <div className="container">
+                    <div className="row grid-margin">
+                        <div className="col-12 text-center common-heading pb-5">
+                            <h2
+                                style={{
+                                    fontSize: "3rem",
+                                    fontFamily: "Philosopher",
+                                }}
+                            >
+                                Featured Books
+                            </h2>
+                            <div className="section-divider divider-traingle"></div>
+                        </div>
+                        {details.length !== 0 ? (
+                            details.slice(0, 4).map((book, i) => {
+                                if (book.library_id == "111") {
+                                    var site_name_image_path = `https://dindayalupadhyay.smartcitylibrary.com/uploads/books/thumbnail/${book.image}`;
+                                } else if (book.library_id == "222") {
+                                    var site_name_image_path = `https://kundanlalgupta.smartcitylibrary.com/uploads/books/thumbnail/${book.image}`;
+                                } else {
+                                    var site_name_image_path = `https://rashtramatakasturba.smartcitylibrary.com/uploads/books/thumbnail/${book.image}`;
+                                }
 
-                                                <div className="card-desc-box d-flex align-items-center justify-content-around">
-                                                    <div
-                                                        style={{
-                                                            width: "fit-content",
-                                                            padding: "auto 5px",
-                                                        }}
-                                                    >
-                                                        <div className="d-flex align-items-center gap-3">
-                                                            <span className="badge badge-info">
-                                                                {book.format ===
-                                                                3
-                                                                    ? "E-Book"
-                                                                    : "Book"}
-                                                            </span>
-
-                                                            {/* {book?.library_id ===
-                                                            111 ? (
-                                                                <span className="badge badge-success">
-                                                                    L1
-                                                                </span>
-                                                            ) : book?.library_id ===
-                                                              222 ? (
-                                                                <span className="badge badge-danger">
-                                                                    L2
-                                                                </span>
-                                                            ) : (
-                                                                <span className="badge badge-primary">
-                                                                    L3
-                                                                </span>
-                                                            )} */}
-                                                        </div>
-                                                        {/* <div>
-                                                            {book.items.find(
-                                                                (item) =>
-                                                                    item.status ===
-                                                                    1
-                                                            ) ? (
-                                                                <span className="badge badge-success">
-                                                                    Available
-                                                                </span>
-                                                            ) : (
-                                                                <span className="badge badge-danger">
-                                                                    Unavailable
-                                                                </span>
-                                                            )}
-                                                        </div> */}
-                                                    </div>
-                                                    <div>
-                                                        {/* <h6 className="text-white pb-2 px-3">
-                                                            Know more about the Book
-                                                        </h6> */}
-                                                        <button
-                                                            className="btn btn-white frontend-btn"
-                                                            onClick={() =>
-                                                                handleDetails(
-                                                                    book.id,
-                                                                    book.library_id,
-                                                                    book.items
-                                                                        .length &&
-                                                                        book
-                                                                            .items[0]
-                                                                            .format
+                                return (
+                                    <div
+                                        key={i}
+                                        className="col-12 col-md-6 col-lg-3 stretch-card mb-3 mb-lg-0"
+                                        data-aos="zoom-in"
+                                    >
+                                        <div className="card color-cards">
+                                            <div className="card-body p-0">
+                                                <div
+                                                    className="text-center card-contents"
+                                                    style={{
+                                                        backgroundColor:
+                                                            "#f2f2f2",
+                                                    }}
+                                                    onClick={() =>
+                                                        handleDetails(
+                                                            `${book.library_id}`
+                                                        )
+                                                    }
+                                                >
+                                                    <div className="card-image">
+                                                        <img
+                                                            // src="images/Group95.svg"
+                                                            loading="lazy"
+                                                            className="case-studies-card-img"
+                                                            alt="image"
+                                                            src={
+                                                                site_name_image_path
+                                                                    ? site_name_image_path
+                                                                    : defaultBook
+                                                            }
+                                                            onError={({
+                                                                currentTarget,
+                                                            }) => {
+                                                                currentTarget.onerror =
+                                                                    null; // prevents looping
+                                                                currentTarget.src =
+                                                                    defaultBook;
+                                                            }}
+                                                            onLoad={() =>
+                                                                setIsLoading(
+                                                                    false
                                                                 )
                                                             }
+                                                        />
+                                                    </div>
+                                                    <div className="card-details text-center pt-4">
+                                                        <h6 className="m-0 pb-1">
+                                                            {book.name
+                                                                ? book.name
+                                                                : "NA"}
+                                                        </h6>
+                                                    </div>
+                                                    <div className="card-desc-box d-flex align-items-center justify-content-around">
+                                                        <div
+                                                            style={{
+                                                                width: "fit-content",
+                                                                padding:
+                                                                    "auto 5px",
+                                                            }}
                                                         >
-                                                            <span>
-                                                                {" "}
-                                                                Read More
-                                                            </span>
-                                                        </button>
+                                                            <div className="d-flex align-items-center gap-3">
+                                                                <span className="badge badge-info">
+                                                                    {book.items
+                                                                        .length &&
+                                                                    book
+                                                                        .items[0]
+                                                                        .format ===
+                                                                        3
+                                                                        ? "E-Book"
+                                                                        : "Book"}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <button
+                                                                className="btn btn-white frontend-btn"
+                                                                onClick={() =>
+                                                                    handleDetails(
+                                                                        `${book.library_id}`
+                                                                    )
+                                                                }
+                                                            >
+                                                                <span>
+                                                                    {" "}
+                                                                    Read More
+                                                                </span>
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            );
-                        })}
+                                );
+                            })
+                        ) : (
+                            <div className="card-details text-center pt-3">
+                                <h6 className="m-0 pb-1">
+                                    No Books Available.
+                                </h6>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </div>
+            ) : (
+                <div className="spinner">
+                    <img src="/public/images/301.gif" />
+                </div>
+            )}
         </section>
     );
 };
 
 const Hero = (props) => {
-    const {
-        navigate,
-        fetchSingleBook,
-        newBookSearch,
-        fetchBooksByNameOrAuthors,
-        findBooksWithout,
-        books,
-        isSearched,
-        goToRef,
-        goTo,
-        searchData,
-        setSearchData,
-        setFilteredBook,
-        setIsSearched,
-        searchBookRef,
-        member,
-    } = props;
-    const dispatch = useDispatch();
+    const inputRef = useRef(null);
+    const [checkprevvalue, setcheckprevvalue] = useState("N/A");
+    const [optionsuggestions, setoptionsuggestions] = useState([]);
+    const [inputValue, setInputValue] = useState("");
 
-    const [value, setValue] = useState("");
+    const [term, setTerm] = useState("");
 
-    const [filter, setFilter] = useState("book");
-    // const [filterBooks, setFilterBooks] = useState(books);
-
-    const handleFilter = (e) => {
-        setFilter((prev) => (prev = e.target.id));
+    const handleSubmit = (e) => {
+        e.preventDefault();
     };
 
-    const onChangeInput = (e) => {
-        const { name, value } = e.target;
-        setSearchData({ ...searchData, [name]: value });
-    };
+    const navigate = useNavigate();
+    /*  const handleDetails = (previewLink) => {
+        navigate("/search/book&" + previewLink);
+    }; */
 
-    // const onHandleSearch = (e) => {
-    //     setIsSearched(true);
-    //     e.preventDefault();
-    //     const { title, searchedBy } = searchData;
-
-    //     var newBooks = [];
-    //     // console.log({ newBooks, title, searchedBy });
-    //     if (title) {
-    //         newBooks = books.filter(
-    //             (book) =>
-    //                 book.authors_name.replaceAll(" ", "").includes(title) ||
-    //                 book.name.replaceAll(" ", "").includes(title)
-    //         );
-    //         goToRef(searchBookRef);
-    //         setFilteredBook(newBooks);
-    //     }
-    // };
-
-    // React search autocomplete;
-
-    const handleOnSearch = useCallback(
-        (string) => {
-            if (string.length) {
-                fetchBooksByNameOrAuthors(
-                    `?search=${string}&limit=&${
-                        filter === "book" ? "by_books=1" : "by_authors=1"
-                    }&skip=0`
-                );
-            } else {
-                dispatch({ type: "NEW_BOOK_SEARCH", payload: [] });
-            }
-            // console.log(string, results, filter);
-            setValue(string);
-        },
-        [filter]
-    );
-
-    const handleOnSelect = (item) => {
-        // the item selected
-        // console.log(item.name.replaceAll(" ", ""));
-        dispatch({ type: "NEW_BOOK_SEARCH", payload: [] });
-        const value =
-            filter === "book"
-                ? item.name.replaceAll(" ", "")
-                : item.authors_name.replaceAll(" ", "");
-
-        goTo(
-            "search/" +
-                filter +
-                "&" +
-                value +
-                "/" +
-                item.id +
-                "/" +
-                item.library_id
-        );
-        // fetchSingleBook(item.id);
-    };
-
-    const formatResult = (item) => {
-        return (
-            <div className="form-result">
-                {item.map((book, i) => {
-                    return (
-                        <span
-                            key={i}
-                            style={{ display: "block", textAlign: "left" }}
-                            onClick={() => handleOnSelect(book)}
-                        >
-                            <i className="fa fa-book nav-icons pr-2"></i>{" "}
-                            {book.name}
-                        </span>
-                    );
-                })}
-            </div>
-        );
-    };
-
-    useEffect(() => {
-        dispatch({ type: "NEW_BOOK_SEARCH", payload: [] });
-    }, []);
-
-    useEffect(() => {
-        const ele = document.querySelector("#onSearch");
-        if (ele) {
-            ele.addEventListener("keypress", function (e) {
-                if (e.key === "Enter") {
-                    if (newBookSearch.length) {
-                        navigate("/search-results");
-                    }
-                }
-            });
+    const handleDetails = (previewLink) => {
+        if (previewLink == "111") {
+            var site_name_image_path = `https://dindayalupadhyay.smartcitylibrary.com`;
+        } else if (previewLink == "222") {
+            var site_name_image_path = `https://kundanlalgupta.smartcitylibrary.com`;
+        } else {
+            var site_name_image_path = `https://rashtramatakasturba.smartcitylibrary.com`;
         }
-    }, [newBookSearch.length]);
 
-    console.log({ newBookSearch });
+        window.location.href = site_name_image_path;
+    };
+
+    const handleButtonClick = (e) => {
+        setTerm(e);
+        setcheckprevvalue(e);
+        setInputValue(e);
+
+        setoptionsuggestions([]);
+    };
+
+    useEffect(() => {
+        if (term !== "" && term != checkprevvalue) {
+            fetch(
+                `${window.location.origin.toString()}/api/v1/books-name?search=${term}&limit=5`
+            )
+                .then((res) => res.json())
+                .then((data) => setoptionsuggestions(data.data));
+        }
+    }, [term]);
+
+    const onChangevalue = (e) => {
+        e.preventDefault();
+        setInputValue(e.target.value);
+
+        setTerm(e.target.value);
+    };
 
     return (
         <div className="banner pt-4">
@@ -629,80 +576,60 @@ const Hero = (props) => {
                     <div className="s003" id="book_search_home_page_form">
                         <div style={{ width: 400 }}>
                             <div className="search-bar">
-                                <div className="dropdown rounded-full">
-                                    <button
-                                        className="btn btn-secondary dropdown-toggle"
-                                        type="button"
-                                        data-bs-toggle="dropdown"
-                                        aria-expanded="false"
-                                    >
-                                        {filter.toUpperCase()}
-                                    </button>
-                                    <ul className="dropdown-menu">
-                                        <li>
-                                            <button
-                                                className="dropdown-item"
-                                                id="book"
-                                                onClick={(e) => handleFilter(e)}
-                                            >
-                                                Book
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button
-                                                className="dropdown-item"
-                                                id="author"
-                                                onClick={(e) => handleFilter(e)}
-                                            >
-                                                Author
-                                            </button>
-                                        </li>
-                                    </ul>
+                                <div
+                                    className="searchByBook"
+                                    data-tooltip-id="search"
+                                >
+                                    {/*  */}
+
+                                    <form>
+                                        <div div className="book_drop">
+                                            <input
+                                                id="onSearch"
+                                                value={inputValue}
+                                                className="form-control"
+                                                type="text"
+                                                placeholder="Search here..."
+                                                ref={inputRef}
+                                                onChange={onChangevalue}
+                                                /*   onChange={(e) => handleOnSearch(e.target.value)} */
+                                            />
+
+                                            {/* new logic  */}
+
+                                            {optionsuggestions.length !== 0 ? (
+                                                <ul class="search-result">
+                                                    {optionsuggestions?.map(
+                                                        (r) => (
+                                                            <li key={r.id}>
+                                                                <a
+                                                                    className=""
+                                                                    onClick={() =>
+                                                                        handleDetails(
+                                                                            `${r.library_id}`
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <i class="fa fa-book nav-icons pr-2"></i>{" "}
+                                                                    {r.name}
+                                                                </a>
+                                                            </li>
+                                                        )
+                                                    )}
+                                                </ul>
+                                            ) : (
+                                                <></>
+                                            )}
+                                        </div>
+                                        {/*  new logic end here  */}
+                                    </form>
                                 </div>
-                                {/* <ReactSearchAutocomplete
-                                    className="auto-complete"
-                                    items={searchBooks}
-                                    onSearch={handleOnSearch}
-                                    onSelect={handleOnSelect}
-                                    autoFocus
-                                    fuseOptions={{
-                                        keys: [
-                                            "authors_name",
-                                            "authors[0].first_name",
-                                            "authors[0].last_name",
-                                            "name",
-                                        ],
-                                        // minMatchCharLength: 6,
-                                    }}
-                                    // resultStringKeyName="authors_name"
-                                    styling={{
-                                        borderRadius: "12px",
-                                        backgroundColor: "#f2f2f2",
-                                    }}
-                                    placeholder={
-                                        filter === "book"
-                                            ? "Search by Book"
-                                            : "Search by Author"
-                                    }
-                                    isCaseSensitive={true}
-                                    formatResult={formatResult}
-                                /> */}
-                                <input
-                                    id="onSearch"
-                                    className="form-control"
-                                    type="text"
-                                    placeholder="Search here..."
-                                    onChange={(e) =>
-                                        handleOnSearch(e.target.value)
-                                    }
-                                />
-                                {newBookSearch.length
-                                    ? formatResult(newBookSearch)
-                                    : null}
+                                {/*  {newBookSearch.length ? formatResult(newBookSearch) : null} */}
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <div className="col-sm-6 banner_image">
                     <img
                         src="images/hero-brown.png"
@@ -943,173 +870,26 @@ const LibraryStack = (props) => {
 };
 
 function TestingApp(props) {
-    const {
-        fetchSingleBook,
-        books,
-        isLoading,
-        fetchBooksAll,
-        fetchAuthorsWithoutToken,
-        authors,
-        findBooksWithout,
-        fetchGenresWithout,
-        fetchBooksByNameOrAuthors,
-        genres,
-        newBookSearch,
-    } = props;
     const searchBookRef = useRef();
     const navigate = useNavigate();
     const member = getCurrentMember();
     const location = useLocation();
 
-    const [searchData, setSearchData] = useState({
-        title: "",
-        searchedBy: "book",
-    });
-    const [isSearched, setIsSearched] = useState(false);
-    const [filteredBook, setFilteredBook] = useState([]);
-    const [isModal, setIsModal] = useState({ show: false, book: [] });
-    const [featuredBooks, setFeaturedBooks] = useState([]);
-
-    const generateRandomNumbers = (limit) => {
-        let num1, num2;
-        do {
-            num1 = Math.floor(Math.random() * limit);
-            num2 = Math.floor(Math.random() * limit);
-        } while (Math.abs(num1 - num2) !== 4 || num1 >= num2);
-        return [num1, num2];
-    };
-
-    const goToRef = (ref) => {
-        ref.current.scrollIntoView({ behavior: "smooth" });
-    };
-
-    useEffect(() => {
-        fetchGenresWithout();
-        fetchAuthorsWithoutToken();
-        fetchBooksAll();
-        window.scroll({ top: 0, behavior: "smooth" });
-    }, []);
-
-    useEffect(() => {
-        if (isSearched) {
-            goToRef(searchBookRef);
-        }
-    }, [isSearched]);
-
-    const goTo = (url) => {
-        navigate(url);
-    };
-
-    const searchBookOptions = {
-        books,
-        filteredBook,
-        isLoading,
-        searchBookRef,
-        searchData,
-        isModal,
-        goTo,
-        setIsModal,
-    };
-
-    const heroOptions = {
-        newBookSearch,
-        books,
-        searchData,
-        isSearched,
-        searchBookRef,
-        setSearchData,
-        goToRef,
-        goTo,
-        setFilteredBook,
-        setIsSearched,
-        member,
-        findBooksWithout,
-        searchData,
-        fetchBooksByNameOrAuthors,
-        fetchSingleBook,
-        navigate,
-    };
-
-    const bookModalOptions = {
-        isModal,
-        setIsModal,
-        goTo,
-    };
-
-    const headerOptions = {
-        goTo,
-        getCurrentMember,
-    };
-
-    const trendingOptions = {
-        findBooksWithout,
-        goTo,
-        books: featuredBooks,
-    };
-
-    const staffOptions = {
-        goTo,
-        findBooksWithout,
-        books: books.toReversed().slice(0, 4),
-    };
-
-    const genresOptions = {
-        genres,
-    };
-
-    useEffect(() => {
-        if (books.length) {
-            const tempBooks = books
-                .toReversed()
-                .filter((book) => book.is_featured === true);
-            if (tempBooks.length) {
-                const [num1, num2] = generateRandomNumbers(tempBooks.length);
-                const slicedBooks = tempBooks.slice(num1, num2);
-                setFeaturedBooks(slicedBooks);
-            }
-        }
-    }, [location.hash, books.length]);
-
     return (
         <>
             <ProgressBar />
-            <Header {...headerOptions} />
+            <Header />
             <div className="content-wrapper">
-                <Hero {...heroOptions} />
+                <Hero />
                 <LibraryStack />
-                {/* {isSearched ? (
-                        <SearchedBooks {...searchBookOptions} />
-                    ) : null} */}
                 <InfoSection />
-                <Staff {...staffOptions} />
-                {/* <Genres {...genresOptions} /> */}
-                <Trending {...trendingOptions} />
-                {/* <Users /> */}
+                <Staff />
+                <Trending />
             </div>
             <Footer />
-            <BookDetails {...bookModalOptions} />
+            {/*  <BookDetails /> */}
         </>
     );
 }
 
-const mapStateToProps = (state) => {
-    const { books, isLoading, authors, genres, newBookSearch } = state;
-    return {
-        books: books,
-        isLoading,
-        authors,
-        genres,
-        newBookSearch,
-    };
-};
-
-export default connect(mapStateToProps, {
-    fetchSingleBook,
-    fetchGenresWithout,
-    fetchBooksAll,
-    fetchAuthorsWithoutToken,
-    findBooksWithout,
-    fetchBooksByNameOrAuthors,
-})(TestingApp);
-
-// export default TestingApp;
+export default TestingApp;

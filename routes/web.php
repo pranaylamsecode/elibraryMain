@@ -79,9 +79,29 @@ Route::get('public_uploads_ebooks/{pdf_name}', function (Request $request) {
     $pdf_name = $request->pdf_name;
 
     if (file_exists(public_path('uploads/ebooks/' . $pdf_name . '/' . $pdf_name . '.pdf'))) {
-        return response()->file(public_path('uploads/ebooks/' . $pdf_name . '/' . $pdf_name . '.pdf'), ['content-type' => 'application/pdf']);
+
+        $pdfPath =  public_path('uploads/ebooks/' . $pdf_name . '/' . $pdf_name . '.pdf') ;
+       /*  return response()->file(public_path('uploads/ebooks/' . $pdf_name . '/' . $pdf_name . '.pdf'), ['content-type' => 'application/pdf']); */
+
+            return response()->stream(
+                function () use ($pdfPath) {
+                    readfile($pdfPath);
+                },
+                200,
+                ['Content-Type' => 'application/pdf']
+            );
     } else {
-        return response()->file(public_path('uploads/ebooks/' . $pdf_name . '/' . $pdf_name . '.PDF'), ['content-type' => 'application/pdf']);
+       /*  return response()->file(public_path('uploads/ebooks/' . $pdf_name . '/' . $pdf_name . '.PDF'), ['content-type' => 'application/pdf']); */
+
+       $pdfPath =  public_path('uploads/ebooks/' . $pdf_name . '/' . $pdf_name . '.pdf') ;
+
+       return response()->stream(
+        function () use ($pdfPath) {
+            readfile($pdfPath);
+        },
+        200,
+        ['Content-Type' => 'application/pdf']
+    );
     }
 });
 
@@ -91,9 +111,29 @@ Route::get('PDFPreview/{pdf_name}', function (Request $request) {
     $pdf_name = $request->pdf_name;
 
     if (file_exists(public_path('uploads/PDFPreview/' . $pdf_name))) {
-        return response()->file(public_path('uploads/PDFPreview/' . $pdf_name), ['content-type' => 'application/pdf']);
+
+        $pdfPath = public_path('uploads/PDFPreview/' . $pdf_name);
+
+        return response()->stream(
+            function () use ($pdfPath) {
+                readfile($pdfPath);
+            },
+            200,
+            ['Content-Type' => 'application/pdf']
+        );
+
+
+       /*  return response()->file(public_path('uploads/PDFPreview/' . $pdf_name), ['content-type' => 'application/pdf']); */
     } else {
-        return response()->file(public_path('uploads/PDFPreview/' . $pdf_name), ['content-type' => 'application/pdf']);
+        $pdfPath = public_path('uploads/PDFPreview/' . $pdf_name);
+
+        return response()->stream(
+            function () use ($pdfPath) {
+                readfile($pdfPath);
+            },
+            200,
+            ['Content-Type' => 'application/pdf']
+        );
     }
 });;
 

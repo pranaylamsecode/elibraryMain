@@ -737,14 +737,7 @@ class BookItemAPIController extends AppBaseController
             $books = array_merge($records->toArray(), $records2->toArray(), $records3->toArray());
         }
 
-        // if (!empty($input['search_by_author'])) {
-        //     $books = $this->bookItemRepo->searchBooks(
-        //         $input,
-        //         $request->get('skip', null),
-        //         $request->get('limit', null)
-        //     );
-        //     return $this->sendResponse($books, 'BookItem retrieved successfully.');
-        // }
+
 
 
         if (!empty($books)) {
@@ -805,4 +798,6 @@ class BookItemAPIController extends AppBaseController
             ['message' => 'BookItem retrieved successfully.', 'totalRecords' => $total],
         );
     }
+
+
 }

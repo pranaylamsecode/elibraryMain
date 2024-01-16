@@ -26,12 +26,23 @@ class SiteVisitCounter extends Controller
             return $datePeriod->format("Y-m-d");
         }, iterator_to_array($period));
 
+
+        $getMaxDateCount = array_map(function ($item) {
+            return $item['count'];
+        }, $count);
+
+        if(!empty($getMaxDateCount))
+        {
+            $maxCount = max($getMaxDateCount);
+        }else{
+            $maxCount = $getMaxDateCount;
+        }
         return response()->json([
             'data' => ['count' => array_map(function ($item) {
                 return $item['count'];
-            }, $count), 'dates' => $data['dates'], 'max' => max(array_map(function ($item) {
-                return $item['count'];
-            }, $count))]
+            }, $count),
+
+            'dates' => $data['dates'], 'max' => $maxCount]
         ]);
     }
 

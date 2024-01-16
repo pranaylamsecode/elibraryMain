@@ -324,7 +324,17 @@
     background-position: center center;
     padding: 15px;
 }
-
+#book_search_home_page_form form {
+    width: 100%;
+    max-width: 680px;
+    margin-bottom: 0;
+    display: flex;
+}
+.searchByBook {
+    width: 100% !important;
+    display: flex;
+    justify-content: center;
+}
 #book_search_home_page_form form .inner-form {
     background: #fff;
     display: -ms-flexbox;
@@ -579,10 +589,4 @@
         margin-bottom: 0;
         width: 100%;
     }
-}
-#book_search_home_page_form form {
-    width: 100%;
-    max-width: 790px;
-    margin-bottom: 0;
-    display: flex !important;
 }

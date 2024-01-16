@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
-import { fetchBooksAll } from "../../member/store/actions/bookAction";
+/* import { fetchBooksAll } from "../../member/store/actions/bookAction"; */
+import defaultBook from "../../../src/assets/images/defaultBook.png";
+import axios from "axios";
 import { connect, useDispatch } from "react-redux";
 import {
     getCurrentMember,
@@ -35,33 +37,41 @@ import {
 } from "../../member/store/actions/isMemberRegisteredAction";
 
 const Staff = (props) => {
-    const { books, goTo, findBooksWithout, isSpinner, setIsSpinner } = props;
+    const { goTo, findBooksWithout, isSpinner, setIsSpinner, library_id } =
+        props;
 
-    const handleDetails = (id, library_id, format) => {
-        // findBooksWithout("id=" + id + "&search_by_book=" + true);
-        // goTo("/search/staff/" + id + "/" + library_id);
-
-        if (format && format === 3) {
-            goTo("/ebook-details/" + id + "/" + library_id);
-            setIsSpinner(true);
-            window.scroll({ top: 0, behavior: "smooth" });
-        } else {
-            goTo(
-                "/search/book&" +
-                    name.replaceAll(" ", "") +
-                    "/" +
-                    id +
-                    "/" +
-                    library_id
-            );
-            setIsSpinner(true);
-            window.scroll({ top: 0, behavior: "smooth" });
-        }
+    const [details, setDetails] = useState([]);
+    const [formgenre, setformGenre] = useState("");
+    const [formauthors, setformauthors] = useState("");
+    const [formpublishers, setformpublishers] = useState("");
+    const [formlanguages, setformlanguages] = useState(0);
+    const [formformats, setformformats] = useState(0);
+    const [formlibrary_id, setLibraryId] = useState(0);
+    const [term, setTerm] = useState("");
+    const navigate = useNavigate();
+    const handleDetails = (previewLink) => {
+        navigate("/search/book&" + previewLink);
     };
 
     useEffect(() => {
+        const fetchDetails = async () => {
+            /* setIsLoading(true); */
+            /* setPrevLimit(10);
+            setPrevSkip(0); */
+
+            const resources = await axios.get(
+                `${window.location.origin.toString()}/api/v1/books?order_by=created_at&limit=4&library_id=${library_id}`
+            );
+
+            setDetails(resources.data.data);
+            /* setIsLoading(false); */
+        };
+        fetchDetails();
+    }, []);
+
+    /* useEffect(() => {
         setTimeout(() => setIsSpinner(false), 1500);
-    }, [isSpinner]);
+    }, [isSpinner]); */
 
     return (
         <section className="case-studies detailTrending">
@@ -76,12 +86,16 @@ const Staff = (props) => {
                         >
                             Trendings Books
                         </h2>
-                        {/* <h6 className="section-subtitle text-muted">
-                            Lorem ipsum dolor sit amet, tincidunt vestibulum.
-                        </h6> */}
                     </div>
-                    {books.length &&
-                        books.map((book, i) => {
+                    {details.length !== 0 ? (
+                        details.slice(0, 4).map((book, i) => {
+                            if (book.library_id == "111") {
+                                var site_name_image_path = `https://dindayalupadhyay.smartcitylibrary.com/uploads/books/thumbnail/${book.image}`;
+                            } else if (book.library_id == "222") {
+                                var site_name_image_path = `https://kundanlalgupta.smartcitylibrary.com/uploads/books/thumbnail/${book.image}`;
+                            } else {
+                                var site_name_image_path = `https://rashtramatakasturba.smartcitylibrary.com/uploads/books/thumbnail/${book.image}`;
+                            }
                             return (
                                 <div
                                     key={i}
@@ -97,29 +111,26 @@ const Staff = (props) => {
                                                 }}
                                                 onClick={() =>
                                                     handleDetails(
-                                                        book.id,
-                                                        book.library_id,
-                                                        book.format
+                                                        `${book.name}/${book.id}/${book.library_id}`
                                                     )
                                                 }
                                             >
                                                 <div className="card-image">
                                                     <img
-                                                        // src="images/Group95.svg"
                                                         src={
-                                                            book.image_path
-                                                                ? book.image_path
-                                                                : "https://cdn-icons-png.flaticon.com/512/3845/3845824.png"
+                                                            book.image
+                                                                ? site_name_image_path
+                                                                : defaultBook
                                                         }
                                                         className="case-studies-card-img"
-                                                        alt="image"
+                                                        alt=""
                                                         onError={({
                                                             currentTarget,
                                                         }) => {
                                                             currentTarget.onerror =
                                                                 null; // prevents looping
                                                             currentTarget.src =
-                                                                "https://cdn-icons-png.flaticon.com/512/3845/3845824.png";
+                                                                defaultBook;
                                                         }}
                                                     />
                                                 </div>
@@ -129,17 +140,8 @@ const Staff = (props) => {
                                                             ? book.name
                                                             : "NA"}
                                                     </h6>
-                                                    {/* <h5 className="text-success">
-                                                    ₹{" "}
-                                                    {book.items
-                                                        ? book.items[0].price
-                                                        : "NA"}
-                                                </h5> */}
                                                 </div>
                                                 <div className="card-desc-box d-flex align-items-center justify-content-around">
-                                                    {/* <h6 className="text-white pb-2 px-3">
-                                                            Know more about the Book
-                                                        </h6> */}
                                                     <div
                                                         style={{
                                                             width: "fit-content",
@@ -160,7 +162,7 @@ const Staff = (props) => {
                                                             {book.library_id ===
                                                             111 ? (
                                                                 <span className="badge badge-danger">
-                                                                     Dindayal
+                                                                    Dindayal
                                                                     Upadhyay
                                                                     Library
                                                                 </span>
@@ -172,7 +174,7 @@ const Staff = (props) => {
                                                                     Library
                                                                 </span>
                                                             ) : (
-                                                                <span className="badge badge-danger`">
+                                                                <span className="badge badge-danger">
                                                                     Rashtramata
                                                                     Kasturba
                                                                     Library
@@ -184,9 +186,7 @@ const Staff = (props) => {
                                                         className="btn btn-white frontend-btn"
                                                         onClick={() =>
                                                             handleDetails(
-                                                                book.id,
-                                                                book.library_id,
-                                                                book.format
+                                                                `${book.name}/${book.id}/${book.library_id}`
                                                             )
                                                         }
                                                     >
@@ -198,7 +198,12 @@ const Staff = (props) => {
                                     </div>
                                 </div>
                             );
-                        })}
+                        })
+                    ) : (
+                        <div className="spinner">
+                            <img src="/public/images/301.gif" />
+                        </div>
+                    )}
                 </div>
             </div>
         </section>
@@ -208,12 +213,15 @@ const Staff = (props) => {
 const SearchedBooks = (props) => {
     const {
         filteredBook,
+        setFilteredBook,
         goTo,
         search,
         findBooksWithout,
         isSpinner,
         setIsSpinner,
+        setIsDisabled,
     } = props;
+
     useEffect(() => {
         window.scroll({ top: 0, behavior: "smooth" });
     }, []);
@@ -257,12 +265,15 @@ const SearchedBooks = (props) => {
                 <div className="col-12 text-center">
                     <h2>Searched Results</h2>
                     <div className="section-divider divider-traingle"></div>
-                    {/* <h6 className="section-subtitle text-muted">
-                        Lorem ipsum dolor sit amet, tincidunt vestibulum.
-                    </h6> */}
                 </div>
                 {bookValues.length ? (
                     bookValues.map((book, index) => {
+                        const modifiedUrl = book.image_path
+                            ? book.image_path.replace(
+                                  /\/(books)(\/|$)/,
+                                  "/$1/thumbnail$2"
+                              )
+                            : null;
                         return (
                             <div
                                 key={index}
@@ -286,11 +297,10 @@ const SearchedBooks = (props) => {
                                         >
                                             <div className="card-image">
                                                 <img
-                                                    // src="images/Group95.svg"
                                                     src={
-                                                        book.image
-                                                            ? book.image
-                                                            : "https://cdn-icons-png.flaticon.com/512/3845/3845824.png"
+                                                        modifiedUrl
+                                                            ? modifiedUrl
+                                                            : defaultBook
                                                     }
                                                     className="case-studies-card-img"
                                                     alt=""
@@ -317,20 +327,22 @@ const SearchedBooks = (props) => {
 
                                                         {book.library_id ===
                                                         111 ? (
-                                                            <span className="badge badge-success">
+                                                            <span className="badge badge-danger">
                                                                 Dindayal
-                                                                Upadhyay Library
+                                                                Upadhyay Digital
+                                                                Library
                                                             </span>
                                                         ) : book.library_id ===
                                                           222 ? (
                                                             <span className="badge badge-danger">
                                                                 Kundanlal Gupta
-                                                                Library
+                                                                Digital Library
                                                             </span>
                                                         ) : (
-                                                            <span className="badge badge-primary">
+                                                            <span className="badge badge-danger">
                                                                 Rashtramata
-                                                                Kasturba Library
+                                                                Kasturba Digital
+                                                                Library
                                                             </span>
                                                         )}
                                                     </div>
@@ -404,11 +416,15 @@ const BookDetails = (props) => {
         subscriptionLimit,
         toggleModal,
         isMemberRegistered,
+        isDisabled,
+        setIsDisabled,
+        setLibraryId,
+        libraryId,
     } = props;
+
     const [isReserved, setReserved] = useState(false);
     const [modal, setModal] = useState(false);
     const [isExpired, setExpired] = useState(false);
-
     const navigate = useNavigate();
 
     const toggle = () => setModal(!modal);
@@ -454,7 +470,7 @@ const BookDetails = (props) => {
             location.hash = "/lms/login";
             dispatch(
                 addToast({
-                    text: "UnAuthenticated",
+                    text: "Please Login",
                     type: toastType.ERROR,
                 })
             );
@@ -483,7 +499,9 @@ const BookDetails = (props) => {
                 if (member.user_library_id != library_id && !isRegistered) {
                     toggleModal();
                 } else {
-                    navigate("/lms/ebook-subscription/" + id);
+                    navigate(
+                        "/lms/ebook-subscription/" + id + "/" + library_id
+                    );
                 }
             }
         } else if (!isAvailable) {
@@ -497,7 +515,7 @@ const BookDetails = (props) => {
             navigate("/lms/login");
             dispatch(
                 addToast({
-                    text: "UnAuthenticated",
+                    text: "Please Login",
                     type: toastType.ERROR,
                 })
             );
@@ -506,7 +524,7 @@ const BookDetails = (props) => {
 
     useEffect(() => {
         window.scroll({ top: 0, behavior: "smooth" });
-        // console.log(history);
+
         if (!member) {
             history = [];
             ebookSub = null;
@@ -521,12 +539,16 @@ const BookDetails = (props) => {
     };
 
     useEffect(() => {
-        setTimeout(() => setIsSpinner(false), 1500);
+        /* setTimeout(() => setIsSpinner(false), 1500); */
     }, []);
+
+    const libraryOnChange = (e) => {
+        setLibraryId(e.target.value);
+    };
 
     return (
         <div className="book-wrapper">
-            {!isSpinner ? (
+            {searchBooks.length ? (
                 <section className="book-details modal-content shadow-none">
                     {searchBooks.filter(
                         (book) =>
@@ -542,30 +564,41 @@ const BookDetails = (props) => {
                               )
                               .slice(-1)
                               .map((book, index) => {
+                                  const authorsName = book
+                                      ? book.book.authors.map((author) => {
+                                            const firstName = author.first_name
+                                                ? author.first_name
+                                                : "";
+                                            const lastName = author.last_name
+                                                ? author.last_name
+                                                : "";
+                                            return (
+                                                firstName +
+                                                " " +
+                                                lastName +
+                                                ", "
+                                            );
+                                        })
+                                      : null;
                                   return book ? (
-                                      <div key={index} className="container">
-                                          {/*  <button
-                                              className="btn back_btn btn-white frontend-btn"
-                                              onClick={() => {
-                                                  setIsSpinner(true);
-                                                  goTo(-1);
-                                              }}
-                                          >
-                                              <span>Back</span>
-                                          </button> */}
-
+                                      <div
+                                          key={index + 111}
+                                          className="container"
+                                      >
                                           <div className="row">
                                               <div className="col-md-6 product_img">
                                                   <img
-                                                      src={
-                                                          book &&
-                                                          book.book.image_path
-                                                              ? book.book
-                                                                    .image_path
-                                                              : "https://cdn-icons-png.flaticon.com/512/3845/3845824.png"
-                                                      }
+                                                      src={book.book.image_path}
                                                       className="img-responsive"
                                                       width={400}
+                                                      onError={({
+                                                          currentTarget,
+                                                      }) => {
+                                                          currentTarget.onerror =
+                                                              null;
+                                                          currentTarget.src =
+                                                              defaultBook;
+                                                      }}
                                                   />
                                               </div>
                                               <div className="col-md-6 product_content px-4 py-3 rounded-lg">
@@ -578,21 +611,17 @@ const BookDetails = (props) => {
                                                       <span>ISBN No: </span>{" "}
                                                       {book && book.book.isbn
                                                           ? book.book.isbn
-                                                          : ""}
+                                                          : "N/A"}
                                                   </p>
+
                                                   <p className="author_name specifications">
                                                       <span>Author: </span>{" "}
-                                                      {book &&
-                                                      book.book.authors[0]
-                                                          .first_name &&
-                                                      book.book.authors[0]
-                                                          .last_name
-                                                          ? book.book.authors[0]
-                                                                .first_name +
-                                                            " " +
-                                                            book.book.authors[0]
-                                                                .last_name
-                                                          : ""}
+                                                      {/* <a
+                                                          href={`books/author/${authorsName}`}
+                                                      >
+                                                          {authorsName}
+                                                      </a> */}
+                                                      {authorsName}
                                                   </p>
                                                   <p className="author_name specifications">
                                                       <span>Format: </span>{" "}
@@ -611,31 +640,65 @@ const BookDetails = (props) => {
                                                       {book.book?.genres?.length
                                                           ? book.book.genres[0]
                                                                 .name
-                                                          : ""}
+                                                          : "N/A"}
+                                                  </p>
+                                                  <p className="author_name specifications">
+                                                      <span>Publisher: </span>
+                                                      {book.publisher.name
+                                                          ? book.publisher.name
+                                                          : "N/A"}
                                                   </p>
                                                   <p className="author_name specifications">
                                                       <span>Belongs To: </span>
-                                                      {book.book.library_id ===
-                                                      111 ? (
-                                                          <span className="badge badge-success">
-                                                              Dindayal Upadhyay
-                                                              Digital Library
-                                                          </span>
-                                                      ) : book.book
-                                                            .library_id ===
-                                                        222 ? (
-                                                          <span className="badge badge-danger">
-                                                              Kundanlal Gupta
-                                                              Digital Library
-                                                          </span>
-                                                      ) : (
-                                                          <span className="badge badge-primary">
-                                                              Rashtramata
-                                                              Kasturba Digital
-                                                              Library
-                                                          </span>
-                                                      )}
+                                                      <div className="publisher">
+                                                          <select
+                                                              defaultValue={
+                                                                  book?.book
+                                                                      ?.library_id
+                                                              }
+                                                              className="form-select"
+                                                              aria-label="Select Library."
+                                                              onChange={
+                                                                  libraryOnChange
+                                                              }
+                                                          >
+                                                              {libraryStatus.length ? (
+                                                                  libraryStatus.map(
+                                                                      (
+                                                                          library,
+                                                                          i
+                                                                      ) => {
+                                                                          return (
+                                                                              <option
+                                                                                  key={
+                                                                                      i
+                                                                                  }
+                                                                                  value={
+                                                                                      library.value
+                                                                                  }
+                                                                                  disabled={
+                                                                                      !isDisabled[
+                                                                                          i
+                                                                                      ]
+                                                                                  }
+                                                                              >
+                                                                                  {
+                                                                                      library.label
+                                                                                  }
+                                                                              </option>
+                                                                          );
+                                                                      }
+                                                                  )
+                                                              ) : (
+                                                                  <option value="">
+                                                                      No records
+                                                                      found.
+                                                                  </option>
+                                                              )}
+                                                          </select>
+                                                      </div>
                                                   </p>
+
                                                   <p className="description">
                                                       {book &&
                                                       book.book.description
@@ -643,9 +706,6 @@ const BookDetails = (props) => {
                                                                 .description
                                                           : ""}
                                                   </p>
-                                                  {/* <h4 className="cost">
-                            ₹ {book ? book.items[0].price : "NA"}
-                        </h4> */}
                                                   <button
                                                       type="button"
                                                       className={`frontend-btn ${
@@ -670,7 +730,14 @@ const BookDetails = (props) => {
                                                               history.length >
                                                                   0 &&
                                                               history[0]
-                                                                  .status !== 5)
+                                                                  .status !==
+                                                                  5 &&
+                                                              history[0]
+                                                                  .book_item
+                                                                  ?.book
+                                                                  .library_id ==
+                                                                  book.book
+                                                                      .library_id)
                                                               ? true
                                                               : false
                                                       }
@@ -683,18 +750,23 @@ const BookDetails = (props) => {
                                                           )
                                                       }
                                                   >
-                                                      {" "}
                                                       <span>
                                                           {" "}
-                                                          {history.length > 0 &&
+                                                          {history.length &&
                                                           history[0].status ===
                                                               2
                                                               ? "Issued"
-                                                              : (history.length >
-                                                                    0 &&
+                                                              : (history.length &&
                                                                     history[0]
                                                                         .status ===
                                                                         1 &&
+                                                                    history[0]
+                                                                        .book_item
+                                                                        ?.book
+                                                                        .library_id ==
+                                                                        book
+                                                                            .book
+                                                                            .library_id &&
                                                                     status.length -
                                                                         1 <=
                                                                         4) ||
@@ -702,8 +774,9 @@ const BookDetails = (props) => {
                                                               ? "Reserved"
                                                               : "Reserve"}
                                                       </span>
-                                                  </button>{" "}
-                                                  {/* {book.pdf_preview_file && (
+                                                  </button>
+
+                                                  {book.pdf_preview_file && (
                                                       <button
                                                           type="button"
                                                           className="ml-3 frontend-btn btn btn-info"
@@ -713,7 +786,7 @@ const BookDetails = (props) => {
                                                       >
                                                           <span>Preview</span>
                                                       </button>
-                                                  )} */}
+                                                  )}
                                               </div>
                                           </div>
                                       </div>
@@ -728,27 +801,20 @@ const BookDetails = (props) => {
                         ? searchBooks.slice(-1).map((book, i) => {
                               return (
                                   <div key={i + 3} className="container">
-                                      {/* <button
-                                          className="btn back_btn btn-white frontend-btn"
-                                          onClick={() => {
-                                              setIsSpinner(true);
-                                              goTo(-1);
-                                          }}
-                                      >
-                                          <span>Back</span>
-                                      </button> */}
-
                                       <div className="row">
                                           <div className="col-md-6 product_img">
                                               <img
-                                                  src={
-                                                      book &&
-                                                      book.book.image_path
-                                                          ? book.book.image_path
-                                                          : "https://cdn-icons-png.flaticon.com/512/3845/3845824.png"
-                                                  }
+                                                  src={book.book.image_path}
                                                   className="img-responsive"
                                                   width={400}
+                                                  onError={({
+                                                      currentTarget,
+                                                  }) => {
+                                                      currentTarget.onerror =
+                                                          null;
+                                                      currentTarget.src =
+                                                          defaultBook;
+                                                  }}
                                               />
                                           </div>
                                           <div className="col-md-6 product_content px-4 py-3 rounded-lg">
@@ -761,21 +827,30 @@ const BookDetails = (props) => {
                                                   <span>ISBN No: </span>{" "}
                                                   {book && book.book.isbn
                                                       ? book.book.isbn
-                                                      : ""}
+                                                      : "N/A"}
                                               </p>
-
                                               <p className="author_name specifications">
                                                   <span>Author: </span>{" "}
-                                                  {book &&
-                                                  book.book.authors[0]
-                                                      .first_name &&
-                                                  book.book.authors[0].last_name
-                                                      ? book.book.authors[0]
-                                                            .first_name +
-                                                        " " +
-                                                        book.book.authors[0]
-                                                            .last_name
-                                                      : ""}
+                                                  {book
+                                                      ? book.book.authors.map(
+                                                            (author) => {
+                                                                const firstName =
+                                                                    author.first_name
+                                                                        ? author.first_name
+                                                                        : "";
+                                                                const lastName =
+                                                                    author.last_name
+                                                                        ? author.last_name
+                                                                        : "";
+                                                                return (
+                                                                    firstName +
+                                                                    " " +
+                                                                    lastName +
+                                                                    ", "
+                                                                );
+                                                            }
+                                                        )
+                                                      : null}
                                               </p>
                                               <p className="author_name specifications">
                                                   <span>Format: </span>{" "}
@@ -785,36 +860,68 @@ const BookDetails = (props) => {
                                                       ? "Paperback"
                                                       : "E-Book"}
                                               </p>
-                                              {/* <p className="author_name specifications">
-                                              <span>Edition: </span>{" "}
-                                              {book.edition}
-                                          </p> */}
+
                                               <p className="author_name specifications">
                                                   <span>Genre: </span>
                                                   {book.book?.genres?.length
                                                       ? book.book.genres[0].name
-                                                      : ""}
+                                                      : "N/A"}
+                                              </p>
+                                              <p className="author_name specifications">
+                                                  <span>Publisher: </span>
+                                                  {book.publisher.name
+                                                      ? book.publisher.name
+                                                      : "N/A"}
                                               </p>
                                               <p className="author_name specifications">
                                                   <span>Belongs To: </span>
-                                                  {book.book.library_id ===
-                                                  111 ? (
-                                                      <span className="badge badge-success">
-                                                          Dindayal Upadhyay
-                                                          Digital Library
-                                                      </span>
-                                                  ) : book.book.library_id ===
-                                                    222 ? (
-                                                      <span className="badge badge-danger">
-                                                          Kundanlal Gupta
-                                                          Digital Library
-                                                      </span>
-                                                  ) : (
-                                                      <span className="badge badge-primary">
-                                                          Rashtramata Kasturba
-                                                          Digital Library
-                                                      </span>
-                                                  )}
+                                                  <div className="publisher">
+                                                      <select
+                                                          defaultValue={
+                                                              book?.book
+                                                                  ?.library_id
+                                                          }
+                                                          className="form-select"
+                                                          aria-label="Select Library."
+                                                          onChange={
+                                                              libraryOnChange
+                                                          }
+                                                      >
+                                                          {libraryStatus.length ? (
+                                                              libraryStatus.map(
+                                                                  (
+                                                                      library,
+                                                                      i
+                                                                  ) => {
+                                                                      return (
+                                                                          <option
+                                                                              key={
+                                                                                  i
+                                                                              }
+                                                                              value={
+                                                                                  library.value
+                                                                              }
+                                                                              disabled={
+                                                                                  !isDisabled[
+                                                                                      i
+                                                                                  ]
+                                                                              }
+                                                                          >
+                                                                              {
+                                                                                  library.label
+                                                                              }
+                                                                          </option>
+                                                                      );
+                                                                  }
+                                                              )
+                                                          ) : (
+                                                              <option value="">
+                                                                  No records
+                                                                  found.
+                                                              </option>
+                                                          )}
+                                                      </select>
+                                                  </div>
                                               </p>
                                               <p className="description">
                                                   {book && book.book.description
@@ -863,7 +970,6 @@ const BookDetails = (props) => {
                                                         "books.table.book-un-available.column"
                                                     )}
                                                 </span>
-                                                <span>(Out Of Stock)</span>
                                             </p>
                                         ))}
                                 </p>
@@ -959,17 +1065,23 @@ const BookDetails = (props) => {
                                                         >
                                                             <span>
                                                                 {" "}
-                                                                {history.length >
-                                                                    0 &&
+                                                                {history.length &&
                                                                 history[0]
                                                                     .status ===
                                                                     2
                                                                     ? "Issued"
-                                                                    : (history.length >
-                                                                          0 &&
+                                                                    : (history.length &&
                                                                           history[0]
                                                                               .status ===
                                                                               1 &&
+                                                                          history[0]
+                                                                              .book_item
+                                                                              ?.book
+                                                                              .library_id ==
+                                                                              book
+                                                                                  .book
+                                                                                  .book
+                                                                                  .library_id &&
                                                                           status.length -
                                                                               1 <=
                                                                               4) ||
@@ -980,108 +1092,74 @@ const BookDetails = (props) => {
                                                         </button>
                                                     )
                                                 ) : (
-                                                    // <button
-                                                    //     type="button"
-                                                    //     className={`frontend-btn ${
-                                                    //         ebookSub &&
-                                                    //         moment(
-                                                    //             ebookSub.returned_on
-                                                    //         ).format(
-                                                    //             "YYYY-MM-DD"
-                                                    //         ) <
-                                                    //             moment().format(
-                                                    //                 "YYYY-MM-DD"
-                                                    //             )
-                                                    //             ? "btn-danger"
-                                                    //             : "btn-warning"
-                                                    //     }`}
-                                                    //     disabled={
-                                                    //         !isAvailable &&
-                                                    //         ebookSub &&
-                                                    //         moment(
-                                                    //             ebookSub.returned_on
-                                                    //         ).format(
-                                                    //             "YYYY-MM-DD"
-                                                    //         ) >
-                                                    //             moment().format(
-                                                    //                 "YYYY-MM-DD"
-                                                    //             )
-                                                    //             ? true
-                                                    //             : false
-                                                    //     }
-                                                    //     onClick={() =>
-                                                    //         handleSubscribe(
-                                                    //             book.id,
-                                                    //             book.book
-                                                    //                 .library_id
-                                                    //         )
-                                                    //     }
-                                                    // >
-                                                    //     <span>
-                                                    //         {" "}
-                                                    //         {ebookSubscription.length >
-                                                    //             0 &&
-                                                    //         ebookSub &&
-                                                    //         !(
-                                                    //             moment(
-                                                    //                 ebookSub.returned_on
-                                                    //             ).format(
-                                                    //                 "YYYY-MM-DD"
-                                                    //             ) <
-                                                    //             moment().format(
-                                                    //                 "YYYY-MM-DD"
-                                                    //             )
-                                                    //         )
-                                                    //             ? "Ebook is Subscribed"
-                                                    //             : ebookSub &&
-                                                    //               moment(
-                                                    //                   ebookSub.returned_on
-                                                    //               ).format(
-                                                    //                   "YYYY-MM-DD"
-                                                    //               ) <
-                                                    //                   moment().format(
-                                                    //                       "YYYY-MM-DD"
-                                                    //                   )
-                                                    //             ? "Book is Expired want to Renew"
-                                                    //             : isAvailable
-                                                    //             ? "Subscribe"
-                                                    //             : "Unavailable"}
-                                                    //     </span>
-                                                    // </button>
-                                                    <a
-                                                        target="_blank"
-                                                        href={
-                                                            book?.book
-                                                                ?.library_id ===
-                                                            111
-                                                                ? "https://dindayalupadhyay.smartcitylibrary.com/" +
-                                                                  location.href.slice(
-                                                                      location.href.lastIndexOf(
-                                                                          "#"
-                                                                      )
-                                                                  )
-                                                                : book?.book
-                                                                      ?.library_id ===
-                                                                  222
-                                                                ? "https://kundanlalgupta.smartcitylibrary.com/" +
-                                                                  location.href.slice(
-                                                                      location.href.lastIndexOf(
-                                                                          "#"
-                                                                      )
-                                                                  )
-                                                                : "https://rashtramatakasturba.smartcitylibrary.com/" +
-                                                                  location.href.slice(
-                                                                      location.href.lastIndexOf(
-                                                                          "#"
-                                                                      )
-                                                                  )
+                                                    <button
+                                                        type="button"
+                                                        className={`frontend-btn ${
+                                                            ebookSub &&
+                                                            moment(
+                                                                ebookSub.returned_on
+                                                            ).format(
+                                                                "YYYY-MM-DD"
+                                                            ) <
+                                                                moment().format(
+                                                                    "YYYY-MM-DD"
+                                                                )
+                                                                ? "btn-danger"
+                                                                : "btn-warning"
+                                                        }`}
+                                                        disabled={
+                                                            !isAvailable &&
+                                                            ebookSub &&
+                                                            moment(
+                                                                ebookSub.returned_on
+                                                            ).format(
+                                                                "YYYY-MM-DD"
+                                                            ) >
+                                                                moment().format(
+                                                                    "YYYY-MM-DD"
+                                                                )
+                                                                ? true
+                                                                : false
                                                         }
-                                                        className="frontend-btn"
+                                                        onClick={() =>
+                                                            handleSubscribe(
+                                                                book.id,
+                                                                book.book
+                                                                    .library_id
+                                                            )
+                                                        }
                                                     >
-                                                        {book.format == 3
-                                                            ? "Subscribe"
-                                                            : "Reserve"}
-                                                    </a>
+                                                        <span>
+                                                            {" "}
+                                                            {ebookSubscription.length >
+                                                                0 &&
+                                                            ebookSub?.library_id &&
+                                                            !(
+                                                                moment(
+                                                                    ebookSub.returned_on
+                                                                ).format(
+                                                                    "YYYY-MM-DD"
+                                                                ) <
+                                                                moment().format(
+                                                                    "YYYY-MM-DD"
+                                                                )
+                                                            )
+                                                                ? "Ebook is Subscribed"
+                                                                : ebookSub &&
+                                                                  moment(
+                                                                      ebookSub.returned_on
+                                                                  ).format(
+                                                                      "YYYY-MM-DD"
+                                                                  ) <
+                                                                      moment().format(
+                                                                          "YYYY-MM-DD"
+                                                                      )
+                                                                ? "Book is Expired want to Renew"
+                                                                : isAvailable
+                                                                ? "Subscribe"
+                                                                : "Unavailable"}
+                                                        </span>
+                                                    </button>
                                                 )}
                                                 {(ebookSub ||
                                                     ebookSub?.length > 0) &&
@@ -1095,13 +1173,6 @@ const BookDetails = (props) => {
                                                     <button
                                                         type="button"
                                                         className="frontend-btn ml-3 btn btn-info"
-                                                        // onClick={() =>
-                                                        //     !book.format === 3
-                                                        //         ? toggle()
-                                                        //         : (location.hash =
-                                                        //               "/view-book/" +
-                                                        //               book.id)
-                                                        // }
                                                         onClick={() => {
                                                             book.format === 3
                                                                 ? (location.hash =
@@ -1113,7 +1184,7 @@ const BookDetails = (props) => {
                                                         <span> Preview</span>
                                                     </button>
                                                 ) : null}
-                                                {/* {book.pdf_preview_file && (
+                                                {book.pdf_preview_file && (
                                                     <button
                                                         type="button"
                                                         className="ml-3 frontend-btn btn btn-info"
@@ -1121,7 +1192,7 @@ const BookDetails = (props) => {
                                                     >
                                                         <span>Preview</span>
                                                     </button>
-                                                )} */}
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -1141,7 +1212,6 @@ const BookDetails = (props) => {
 
 function UserBookDetails(props) {
     const {
-        fetchBooksAll,
         books,
         reserveBook,
         findBooksWithout,
@@ -1161,16 +1231,19 @@ function UserBookDetails(props) {
     const dispatch = useDispatch();
     const member = getCurrentMember();
     const [filteredBook, setFilteredBook] = useState([]);
+    const [filteredBooks, setFilteredBooks] = useState([]);
     const [value, setValue] = useState("");
     const [filter, setFilter] = useState("book");
     const [isSpinner, setIsSpinner] = useState(true);
     const [isAvailable, setIsAvailable] = useState(true);
     const [isRegistered, setIsRegistered] = useState(false);
+    const [isDisabled, setIsDisabled] = useState([]);
+    const [libraryId, setLibraryId] = useState(library_id);
 
     const navigate = useNavigate();
     useEffect(() => {
         fetchEbookSubscription();
-        fetchBooksAll();
+        /* fetchBooksAll(); */
         if (!_.isEmpty(member)) {
             if (member.subscription) {
                 fetchBooksHistory({
@@ -1193,28 +1266,27 @@ function UserBookDetails(props) {
                     library_id
             );
         }
-        if (books) {
-            let newBooks = books.filter((book) =>
-                search.split("&")[0] !== "book"
-                    ? book.authors[0].first_name
-                          .replaceAll(" ", "")
-                          .match(search.split("&")[1])
-                    : book.name
-                          .replaceAll(" ", "")
-                          .includes(search.split("&")[1])
-            );
-            setFilteredBook(newBooks);
+        if (searchBooks) {
+            // let newBooks = searchBooks.filter((book) =>
+            //     search.split("&")[0] !== "book"
+            //         ? book.authors[0].first_name
+            //               .replaceAll(" ", "")
+            //               .match(search.split("&")[1])
+            //         : book.name
+            //               .replaceAll(" ", "")
+            //               .includes(search.split("&")[1])
+            // );
+            setFilteredBook(searchBooks);
         }
 
         window.scroll({ top: 0, behavior: "smooth" });
-    }, [reserveBook, search, id, library_id]);
-
-    // console.log({ member });
+    }, [reserveBook, search, id, library_id, location.hash]);
 
     useEffect(() => {
         fetchSubscriptionLimit();
         if (member) fetchMemberStatus(member.id);
     }, []);
+
     const goTo = (url) => {
         navigate(url);
     };
@@ -1231,12 +1303,13 @@ function UserBookDetails(props) {
         goTo,
         isSpinner,
         setIsSpinner,
+        setIsDisabled,
     };
 
     const bookDetails = {
         member,
         bookHistory,
-        searchBooks,
+        searchBooks: filteredBooks,
         reserveBook,
         dispatch,
         member,
@@ -1250,18 +1323,17 @@ function UserBookDetails(props) {
         toggleModal,
         fetchMemberStatus,
         isMemberRegistered,
+        isDisabled,
+        setIsDisabled,
+        setLibraryId,
+        libraryId,
     };
 
     const handleOnSearch = (string, results) => {
-        // onSearch will have as the first callback parameter
-        // the string searched and for the second the results.
-        // console.log(string, results);
         setValue(string);
     };
 
     const handleOnSelect = (item) => {
-        // the item selected
-        // console.log(item.name.replaceAll(" ", ""));
         const value =
             filter === "book"
                 ? item.name.replaceAll(" ", "")
@@ -1296,109 +1368,44 @@ function UserBookDetails(props) {
         books: books.slice(6, 10),
         isSpinner,
         setIsSpinner,
+        library_id,
     };
 
     const content = `These book belongs to ${
         library_id
-            ? libraryStatus.find((status) => status.id == library_id).name
+            ? libraryStatus.find((status) => status.id == library_id)?.name
             : "N/A"
     } Library. And Your are not the Member either. Do you want to Register for ${
         library_id
-            ? libraryStatus.find((status) => status.id == library_id).name
+            ? libraryStatus.find((status) => status.id == library_id)?.name
             : "N/A"
     } and Continue ?`;
+
+    useEffect(() => {
+        if (searchBooks.length) {
+            const tempBooks = searchBooks.filter(
+                (book) => book?.book?.library_id == libraryId
+            );
+            setFilteredBooks(tempBooks);
+
+            const tempIsDisabled = libraryStatus.map((status, i) =>
+                searchBooks.find(
+                    (book, i) => book?.book?.library_id == status.value
+                )
+                    ? true
+                    : false
+            );
+
+            setIsDisabled(tempIsDisabled);
+        }
+    }, [libraryId, searchBooks]);
 
     return (
         <div>
             <ProgressBar />
             <Header goTo={goTo} />
             {!id ? (
-                <>
-                    <div
-                        className="s003 container searchbooks d-flex flex-column align-items-center gap-3"
-                        id="book_search_home_page_form"
-                    >
-                        {/* <div style={{ width: 400 }}>
-                            <div className="search-bar">
-                                <div className="dropdown rounded-full advanced-search">
-                                    <button
-                                        className="btn btn-secondary dropdown-toggle"
-                                        type="button"
-                                        data-bs-toggle="dropdown"
-                                        aria-expanded="false"
-                                    >
-                                        Advanced
-                                    </button>
-                                    <ul className="dropdown-menu">
-                                        <li>
-                                            <input
-                                                type="checkbox"
-                                                name="price"
-                                            />
-                                            <label htmlFor="price">Price</label>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div className="dropdown rounded-full">
-                                    <button
-                                        className="btn btn-secondary dropdown-toggle"
-                                        type="button"
-                                        data-bs-toggle="dropdown"
-                                        aria-expanded="false"
-                                    >
-                                        {filter.toUpperCase()}
-                                    </button>
-                                    <ul className="dropdown-menu">
-                                        <li>
-                                            <button
-                                                className="dropdown-item"
-                                                id="book"
-                                                onClick={(e) => handleFilter(e)}
-                                            >
-                                                Book
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button
-                                                className="dropdown-item"
-                                                id="author"
-                                                onClick={(e) => handleFilter(e)}
-                                            >
-                                                Author
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <ReactSearchAutocomplete
-                                    className="auto-complete"
-                                    items={books}
-                                    onSearch={handleOnSearch}
-                                    onSelect={handleOnSelect}
-                                    autoFocus
-                                    fuseOptions={{
-                                        keys: [
-                                            "authors_name",
-                                            "authors[0].first_name",
-                                            "authors[0].last_name",
-                                            "name",
-                                        ],
-                                        // minMatchCharLength: 6,
-                                    }}
-                                    // resultStringKeyName="authors_name"
-                                    styling={{
-                                        borderRadius: "12px",
-                                        backgroundColor: "#f2f2f2",
-                                    }}
-                                    placeholder="Search a Book"
-                                    isCaseSensitive={true}
-                                    formatResult={formatResult}
-                                />
-                            </div>
-                        </div> */}
-                    </div>
-
-                    <SearchedBooks {...searchBookOptions} />
-                </>
+                <SearchedBooks {...searchBookOptions} />
             ) : (
                 <BookDetails {...bookDetails} />
             )}
@@ -1429,6 +1436,7 @@ const mapStateToProps = (state) => {
         subscriptionLimit,
         isMemberRegistered,
     } = state;
+
     return {
         books,
         searchBooks,
@@ -1441,7 +1449,7 @@ const mapStateToProps = (state) => {
 
 export default connect(mapStateToProps, {
     fetchSubscriptionLimit,
-    fetchBooksAll,
+
     findBooksWithout,
     reserveBook,
     fetchBooksHistory,

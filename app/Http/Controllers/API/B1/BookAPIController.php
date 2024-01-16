@@ -127,9 +127,17 @@ class BookAPIController extends AppBaseController
      */
     public function show(Book $book)
     {
-        $book = Book::with(['tags', 'genres', 'authors', 'items.language', 'items.publisher'])->findOrFail($book->id);
+        $book = Book::with(['tags', 'genres', 'authors', 'items.language', 'items.publisher','items.ebooksubscriptions.member'])->findOrFail($book->id);
         return $this->sendResponse($book->toArray(), 'Book retrieved successfully.');
     }
+
+    public function show2(Book $book)
+    {
+        $book = Book::with(['tags', 'genres', 'authors', 'items.language', 'items.publisher','items.ebooksubscriptions.member'])->findOrFail($book->id);
+        return $this->sendResponse($book->toArray(), 'Book retrieved successfully.');
+    }
+
+
 
     /**
      * Update the specified Book in storage.
@@ -343,6 +351,26 @@ class BookAPIController extends AppBaseController
         return $this->sendResponse(
             $books->toArray(),
             'Books retrieved successfully.',
+            ['totalRecords' => $this->bookRepository->all($input)]
+        );
+    }
+
+    public function getEBooks2(Request $request)
+    {
+        $input = $request->except(['skip', 'limit']);
+        $input['format'] = 3;
+        $input['for_ebooks']  = true;
+        $books = $this->bookRepository->all(
+            $input,
+            $request->get('skip'),
+            $request->get('limit')
+        );
+
+        $input['withCount'] = 1;
+
+        return $this->sendResponse(
+            $books->toArray(),
+
             ['totalRecords' => $this->bookRepository->all($input)]
         );
     }

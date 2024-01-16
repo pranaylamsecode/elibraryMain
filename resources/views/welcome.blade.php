@@ -7,6 +7,16 @@
     <title>Elibrary</title>
     <!-- Fonts -->
 
+    <link rel="stylesheet" href="{{ asset('css/style.min.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('css/style.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/bookSearch.css') }}">
+    <link rel="stylesheet" href="{{ mix('css/app.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/vendors/owl-carousel/css/owl.carousel.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/vendors/owl-carousel/css/owl.theme.default.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/vendors/mdi/css/materialdesignicons.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/vendors/aos/css/aos.css') }}">
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" />
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
@@ -20,17 +30,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Philosopher:wght@400;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="{{ asset('css/bookSearch.css') }}">
-    <link rel="stylesheet" href="{{ mix('css/app.css') }}" />
-    <link rel="stylesheet" href="{{ asset('css/vendors/owl-carousel/css/owl.carousel.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/vendors/owl-carousel/css/owl.theme.default.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/vendors/mdi/css/materialdesignicons.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/vendors/aos/css/aos.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/style.min.css') }}">
-  
+
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-
+    {{-- <link rel="stylesheet" href="{{ asset('css/style.min.css?v=' . filemtime(public_path('css/style.min.css'))) }}" /> --}}
 
 </head>
 <style>
@@ -63,6 +67,35 @@
         padding: 0px !important;
     }
 
+
+    .backend .table-bordered.table-striped::-webkit-scrollbar-thumb {
+        background: #ccc !important;
+    }
+
+    .backend .table-bordered.table-striped::-webkit-scrollbar {
+        height: 14px;
+    }
+
+    .backend .table-bordered.table-striped {
+        overflow-y: auto;
+        max-height: 60vh;
+    }
+
+
+    .backend .table-responsive {
+        overflow-y: auto;
+        max-height: 60vh;
+    }
+
+    .backend .table-responsive::-webkit-scrollbar-thumb {
+        background: #ccc !important;
+    }
+
+    .backend .table-responsive::-webkit-scrollbar {
+        height: 14px !important;
+    }
+
+
     img#loader-welcome,
     .spinner img {
         width: 46px;
@@ -90,6 +123,118 @@
 
     #loading-image {
         z-index: 9999;
+    }
+
+
+    .frontend .table-bordered::-webkit-scrollbar,
+    .frontend .table-responsive::-webkit-scrollbar {
+        height: 14px;
+    }
+
+    .frontend #resources-list .table-responsive {
+        max-height: 600px !important;
+    }
+
+    .frontend #resources-list table.sheet0.gridlines {
+        margin: 0px !important;
+    }
+
+    .frontend #resources-list .table-responsive::-webkit-scrollbar-thumb {
+        background: #c27b7f !important;
+    }
+
+    .frontend #resources-list .table-responsive::-webkit-scrollbar {
+        height: 13px;
+    }
+
+    .frontend .table-responsive::-webkit-scrollbar {
+        background: #e4e5e8;
+    }
+
+
+    #resources-list thead,
+    #resources-list tbody,
+    #resources-list tfoot,
+    #resources-list tr,
+    #resources-list td,
+    #resources-list th {
+        border-color: inherit;
+        border-style: solid;
+        border-width: 0;
+        border: 1px solid #c0bfbf !important;
+
+        padding: 4px;
+    }
+
+    #resources-list .table-responsive {
+        overflow: auto !important;
+    }
+
+    #resources-list tbody,
+    #resources-list td,
+    #resources-list tfoot,
+    #resources-list th,
+    #resources-list thead,
+    #resources-list tr {
+        border: 1px solid #c1c1c1 !important;
+        border-color: inherit;
+    }
+
+    #resources-list table {
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+    #resources-list td,
+    #resources-list th {
+        padding: 0;
+        text-align: left;
+    }
+
+    #resources-list table {
+        -moz-border-radius: 4px;
+        -webkit-border-radius: 4px;
+        background-color: #fff;
+        border-radius: 4px;
+        font-size: 12px;
+        line-height: 1.25;
+        margin-bottom: 24px;
+        width: 100%;
+    }
+
+    #resources-list table td {
+        padding: 12px 6px 12px 22px;
+        word-wrap: break-word;
+        font-size: 15px;
+    }
+
+    #resources-list thead th {
+        background-color: #f6f6f6;
+        padding: 18px 6px 18px 22px;
+        font-size: 15px;
+        color: #444;
+        border-bottom-color: rgba(113, 110, 182, 0.15) !important;
+    }
+
+    #resources-list thead th:first-child {
+        border-top-left-radius: 4px;
+    }
+
+    #resources-list thead th:last-child {
+        border-top-right-radius: 4px;
+    }
+
+    #resources-list table {
+        border: 1px solid rgba(113, 110, 182, 0.15);
+    }
+
+    #resources-list table tr {
+        border-bottom: 1px solid rgba(113, 110, 182, 0.15);
+    }
+
+    #resources-list table tr:hover {
+        background-color: rgba(113, 110, 182, 0.15);
+        color: #272b37;
     }
 </style>
 
@@ -121,20 +266,6 @@
 {{-- <script src="{{ asset('js/choices.js') }}"></script> --}}
 <script src="{{ asset('js/landingpage.js') }}"></script>
 
-{{-- <script>
-    $(document).ready(function() {
-
-        if (jQuery("[data-trigger]").length > 0) {
-            const choices = new Choices('[data-trigger]', {
-
-                : false,
-                itemSelectText: '',
-            });
-
-        }
-
-    });
-</script> --}}
 
 <script>
     $(window).on('load', function() {
@@ -143,36 +274,6 @@
     });
     jQuery(document).ready(function() {
 
-        // setTimeout(() => {
-        //     jQuery(".react-slidedown.pro-inner-list-item li.pro-sub-menu").each(function() {
-        //         if (jQuery(this).find(".pro-menu-item").hasClass("active")) {
-        //             jQuery(this).find(".react-slidedown.pro-inner-list-item").removeClass(
-        //                     "closed")
-        //                 .addClass("open").css("height", "auto");
-        //             jQuery(this).addClass("open");
-        //             jQuery(this).find(".pro-inner-item").trigger("click");
-        //         }
-
-        //     });
-
-        // }, 1500);
-
-        // setInterval(() => {
-        //     setTimeout(() => {
-        //         jQuery(".react-slidedown.pro-inner-list-item li.pro-sub-menu").each(function() {
-
-        //             if (jQuery(this).find(".pro-menu-item").hasClass("active")) {
-        //                 jQuery(this).find(".react-slidedown.pro-inner-list-item")
-        //                     .removeClass(
-        //                         "closed")
-        //                     .addClass("open").css("height", "auto");
-        //                 jQuery(this).addClass("open");
-        //                 // jQuery(this).find(".pro-inner-item").trigger("click");
-        //             }
-
-        //         });
-        //     }, 2000);
-        // }, 1);
         setInterval(() => {
 
 
@@ -201,35 +302,14 @@
         }, 100);
 
 
-        // jQuery('.video-btn').click(function() {
-        //     ytPlayer.playVideo();
-
-        // });
-
         setInterval(() => {
-            // jQuery(".react-slidedown.pro-inner-list-item li.pro-sub-menu").each(function() {
-            //     if (jQuery(this).find(".pro-menu-item").hasClass("active")) {
-            //         jQuery(this).find(".react-slidedown.pro-inner-list-item").removeClass(
-            //                 "closed")
-            //             .addClass("open").css("height", "auto");
-            //         jQuery(this).addClass("open");
-            //         // jQuery(this).find(".pro-inner-item").trigger("click");
-            //     }
-
-            // });
 
             jQuery(".genres select").click(function() {
-
                 jQuery('.genres select option:first-child').attr("selected", false);
-
-
             });
-
-
             jQuery(".publisher select").click(function() {
 
                 jQuery('.publisher select option:first-child').attr("selected", false);
-
 
             });
             jQuery(".reset button").click(function() {
@@ -239,8 +319,7 @@
             });
         }, 1000);
         var src = jQuery('.video_popup iframe').attr('src');
-        // jQuery('.video_popup iframe').attr('data-src', src);
-        // var src_new = jQuery('.video_popup iframe').attr('data-src');
+
         setInterval(function() {
             jQuery('.video-btn').click(function() {
                 jQuery('.video_popup iframe').attr('src', src);
@@ -275,18 +354,11 @@
             jQuery(this).addClass("active_dash");
             jQuery('.elibrary').removeClass("active_dash");
 
-            //   window.location.href="#/admin/pos/pos-dashboard";
         });
 
 
         setInterval(() => {
-            // if (window.location.href.indexOf("pos-dashboard") > -1) {
 
-            //             jQuery('.erp').addClass("active_dash");
-            //             // jQuery('.erp').trigger("click");
-            //         jQuery('.elibrary').removeClass("active_dash");
-
-            // }
             jQuery(".image__holder button:contains('Cancel')").addClass("remove");
 
             jQuery(".frontend .navbar .navbar-menu-wrapper.navbar-collapse.show li:not(.dropdown)")
@@ -300,23 +372,6 @@
                     });
                 });
         }, 1000);
-
-        // setTimeout(function() {
-        //     var ebook = jQuery(".e-book-avilable").html();
-        //     jQuery(".product_content").append(ebook);
-        // }, 2000);
-
-        //    setInterval(() => {
-        //     if (window.location.href.indexOf("lms-dashboard") > -1) {
-
-        //                 jQuery('.elibrary').addClass("active_dash");
-        //                 // jQuery('.erp').trigger("click");
-        //             jQuery('.erp').removeClass("active_dash");
-
-        //         }
-        //    }, 1000);
-
-
 
 
     });

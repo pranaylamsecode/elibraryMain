@@ -60,7 +60,7 @@ class AuthorAPIController extends AppBaseController
 
         $authors = array_merge($authors->toArray(), $authors2->toArray(), $authors3->toArray());
 
-        $filteredArray = array();
+        /* $filteredArray = array();
 
         foreach ($authors as $key => $value) {
 
@@ -68,7 +68,7 @@ class AuthorAPIController extends AppBaseController
             if (!empty($value)) {
                 array_push($filteredArray, $value);
             }
-        }
+        } */
 
        // Extract the 'name' column from the array
             $names = array_column($authors, 'full_name');

@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\GenreAPIController;
 use App\Http\Controllers\API\V1\BookAPIController;
 use App\Http\Controllers\API\V1\BookAPIController2;
+use App\Http\Controllers\API\V1\BookAPIControllerNamesSuggestion;
+
 use App\Http\Controllers\EbookSubscribeController;
 use App\Http\Controllers\frontendContactController;
 use App\Http\Controllers\API\V1\AuthorAPIController;
@@ -30,7 +32,9 @@ use App\Http\Controllers\LatestBook;
 
 Route::resource('/v1/publishers', PublisherAPIController::class);
 Route::get('/v1/books/{id?}', [BookAPIController::class, 'index'])->name('books.index');
-Route::get('/v1/books2/{id?}', [BookAPIController2::class, 'index'])->name('books.index');
+Route::get('/v1/books2/{id?}', [BookAPIController2::class, 'index']);
+Route::get('/v1/books-name/{id?}', [BookAPIControllerNamesSuggestion::class, 'index']);
+Route::get('/v1/authors-name/{id?}', [BookAPIControllerNamesSuggestion::class, 'getAuthorsNames']);
 Route::get('/v1/less-books', [BookAPIController::class, 'fetch4Books'])->name('books.fetch4Books');
 Route::get('/v1/less-books-2', [BookAPIController::class, 'fetch4Books2'])->name('books.fetch4Books2');
 Route::get('/v1/authors', [AuthorAPIController::class, 'index'])->name('authors.index');
@@ -75,6 +79,8 @@ Route::middleware(['auth:sanctum', 'member.auth', 'subscription'])->group(functi
     Route::post('/v1/update-settings', [MemberSettingAPIController::class, 'update']);
     // get e-books
     Route::get('/v1/e-books', [BookItemAPIController::class, 'getEBooks'])->name('e-books');
+
+
 
 
     Route::get('/v1/get-member-transactions', [TransactionAPIController::class, 'index']);

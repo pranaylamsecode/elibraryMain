@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import React, { useCallback, useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router";
 import ProgressBar from "../../shared/progress-bar/ProgressBar";
 import Header from "./Header";
 import Footer from "./Footer";
+import axios from "axios";
+import defaultBook from "../../../src/assets/images/defaultBook.png";
 import { connect, useDispatch } from "react-redux";
 import { fetchBooksHistory } from "../../member/store/actions/bookHistoryAction";
 import { fetchEbookSubscription } from "../../member/store/actions/ebookSubscriptionAction";
 import { reserveBook } from "../../member/store/actions/bookSearchAction";
 import { bookItemStatusConstants } from "../../constants";
 import { findBooksWithout } from "../../member/store/actions/bookSearchAction";
-import { fetchBooksAll } from "../../member/store/actions/bookAction";
+/* import { fetchBooksAll, fe } from "../../member/store/actions/bookAction"; */
 import { getCurrentMember } from "../../admin/shared/sharedMethod";
 import PDFviewerModal from "../book-details/PDFviewerModal";
 import moment from "moment";
@@ -25,14 +27,38 @@ import {
     fetchMemberStatus,
     registerMemberToLibrary,
 } from "../../member/store/actions/isMemberRegisteredAction";
-const Staff = (props) => {
-    const { books, goTo, findBooksWithout } = props;
+import { getFormattedMessage } from "../../shared/sharedMethod";
 
-    const handleDetails = (id) => {
-        findBooksWithout("id=" + id + "&search_by_book=" + true);
-        goTo("/search/staff/" + id);
-        window.scroll({ top: 0, behavior: "smooth" });
+const Staff = (props) => {
+    const { goTo, findBooksWithout } = props;
+    const [details, setDetails] = useState([]);
+    const [formgenre, setformGenre] = useState("");
+    const [formauthors, setformauthors] = useState("");
+    const [formpublishers, setformpublishers] = useState("");
+    const [formlanguages, setformlanguages] = useState(0);
+    const [formformats, setformformats] = useState(0);
+    const [formlibrary_id, setLibraryId] = useState(0);
+    const [term, setTerm] = useState("");
+    const navigate = useNavigate();
+    const handleDetails = (previewLink) => {
+        navigate("/search/book&" + previewLink);
     };
+
+    useEffect(() => {
+        const fetchDetails = async () => {
+            /* setIsLoading(true); */
+            /* setPrevLimit(10);
+            setPrevSkip(0); */
+
+            const resources = await axios.get(
+                `${window.location.origin.toString()}/api/v1/books?order_by=created_at&limit=${4}&search=${term}&genre=${formgenre}&library_id=111&author=${formauthors}&publisher=${formpublishers}&language=${formlanguages}&format=${formformats}`
+            );
+
+            setDetails(resources.data.data);
+            /* setIsLoading(false); */
+        };
+        fetchDetails();
+    }, []);
 
     return (
         <section className="case-studies detailTrending">
@@ -48,8 +74,15 @@ const Staff = (props) => {
                             Trendings Books
                         </h2>
                     </div>
-                    {books &&
-                        books.map((book, i) => {
+                    {details &&
+                        details.slice(0, 4).map((book, i) => {
+                            if (book.library_id == "111") {
+                                var site_name_image_path = `https://dindayalupadhyay.smartcitylibrary.com/uploads/books/thumbnail/${book.image}`;
+                            } else if (book.library_id == "222") {
+                                var site_name_image_path = `https://kundanlalgupta.smartcitylibrary.com/uploads/books/thumbnail/${book.image}`;
+                            } else {
+                                var site_name_image_path = `https://rashtramatakasturba.smartcitylibrary.com/uploads/books/thumbnail/${book.image}`;
+                            }
                             return (
                                 <div
                                     key={i}
@@ -64,17 +97,27 @@ const Staff = (props) => {
                                                     backgroundColor: "#f2f2f2",
                                                 }}
                                                 onClick={() =>
-                                                    handleDetails(book.id)
+                                                    handleDetails(
+                                                        `${book.name}/${book.id}/${book.library_id}`
+                                                    )
                                                 }
                                             >
                                                 <div className="card-image">
                                                     <img
                                                         // src="images/Group95.svg"
                                                         src={
-                                                            book.image_path
-                                                                ? book.image_path
-                                                                : "https://cdn-icons-png.flaticon.com/512/3845/3845824.png"
+                                                            book.image
+                                                                ? site_name_image_path
+                                                                : defaultBook
                                                         }
+                                                        onError={({
+                                                            currentTarget,
+                                                        }) => {
+                                                            currentTarget.onerror =
+                                                                null; // prevents looping
+                                                            currentTarget.src =
+                                                                defaultBook;
+                                                        }}
                                                         className="case-studies-card-img"
                                                         alt=""
                                                     />
@@ -85,17 +128,8 @@ const Staff = (props) => {
                                                             ? book.name
                                                             : "NA"}
                                                     </h6>
-                                                    {/* <h5 className="text-success">
-                                                    ₹{" "}
-                                                    {book.items
-                                                        ? book.items[0].price
-                                                        : "NA"}
-                                                </h5> */}
                                                 </div>
                                                 <div className="card-desc-box d-flex align-items-center justify-content-around">
-                                                    {/* <h6 className="text-white pb-2 px-3">
-                                                            Know more about the Book
-                                                        </h6> */}
                                                     <div
                                                         className="badge badge-info"
                                                         style={{
@@ -104,8 +138,10 @@ const Staff = (props) => {
                                                         }}
                                                     >
                                                         <span>
-                                                            {book?.items[0]
-                                                                ?.format === 3
+                                                            {book.items
+                                                                .length &&
+                                                            book.items[0]
+                                                                .format === 3
                                                                 ? "E-Book"
                                                                 : "Book"}
                                                         </span>
@@ -114,7 +150,7 @@ const Staff = (props) => {
                                                         className="btn btn-white frontend-btn"
                                                         onClick={() =>
                                                             handleDetails(
-                                                                book.id
+                                                                `${book.name}/${book.id}/${book.library_id}`
                                                             )
                                                         }
                                                     >
@@ -147,6 +183,13 @@ const BookDetails = (props) => {
         isAvailable,
         setIsAvailable,
         toggleModal,
+        libraryId,
+        setLibraryId,
+        filteredBook,
+        isDisabled,
+        formatId,
+        setFormatId,
+        isFormatDisabled,
     } = props;
     const [isReserved, setReserved] = useState(false);
     const [modal, setModal] = useState(false);
@@ -155,32 +198,43 @@ const BookDetails = (props) => {
 
     const navigate = useNavigate();
 
+    const libraryOnChange = (e) => {
+        setLibraryId(e.target.value.toString());
+    };
+    const formatOnChange = (e) => {
+        setFormatId(e.target.value.toString());
+    };
+
     const toggle = () => setModal(!modal);
     var history = [];
     var ebookSub = null;
     const status = bookHistory.filter((book) => book.status === 1);
 
-    if (ebookSubscription.length > 0 && member) {
+    if (ebookSubscription.length && member && filteredBook.length) {
         ebookSub = ebookSubscription.find(
             (ebook) =>
                 ebook.member_id === member.id &&
-                searchBooks[0]?.id === ebook.ebook_id
+                filteredBook[0].id === ebook.ebook_id &&
+                filteredBook[0].book.library_id === ebook.library_id
         );
     }
 
-    if (searchBooks.length > 0 && bookHistory.length > 0) {
+    if (filteredBook.length && bookHistory.length && filteredBook.length) {
         history = bookHistory.filter(
-            (book) => searchBooks[0].id == book.book_item_id
+            (book) => filteredBook[0].id == book.book_item_id
         );
     }
 
-    console.log({
-        ebookSubscription,
-        ebookSub,
-        searchBooks,
-        subscriptionLimit,
-        isAvailable,
-    });
+    // console.log({
+    //     member,
+    //     ebookSubscription,
+    //     ebookSub,
+    //     searchBooks,
+    //     subscriptionLimit,
+    //     isAvailable,
+    // });
+
+    // console.log({ filteredBook, libraryId });
 
     useEffect(() => {
         window.scroll({ top: 0, behavior: "smooth" });
@@ -194,7 +248,7 @@ const BookDetails = (props) => {
         modal,
         toggle,
         filePath:
-            searchBooks.length > 0 ? searchBooks[0].pdf_preview_file : null,
+            filteredBook.length > 0 ? filteredBook[0].pdf_preview_file : null,
     };
 
     useEffect(() => {
@@ -204,244 +258,261 @@ const BookDetails = (props) => {
     useEffect(() => {
         if (searchBooks.length && subscriptionLimit.length) {
             const esub = subscriptionLimit.find(
-                (sub) => sub.ebook_id == searchBooks[0]?.id
+                (sub) => sub.ebook_id == filteredBook[0]?.id
             );
             if (esub && esub.count === 20) {
                 setIsAvailable(false);
             }
         }
-    }, [searchBooks.length, subscriptionLimit.length]);
+    }, [filteredBook.length, subscriptionLimit.length]);
 
     return (
         <div className="book-wrapper">
             <section className="book-details modal-content shadow-none">
                 {!isSpinner ? (
-                    searchBooks.map((book, index) => {
-                        return book.format === 3 ? (
-                            <div key={index + 34} className="container">
-                                {/* <button
-                                    className="btn back_btn btn-white frontend-btn"
-                                    onClick={() => {
-                                        setIsSpinner(true);
-                                        goTo(-1);
-                                    }}
-                                >
-                                    <span>Back</span>
-                                </button> */}
+                    filteredBook.length ? (
+                        filteredBook.map((book, index) => {
+                            return book.format === 3 ? (
+                                <div key={index + 34} className="container">
+                                    <div className="row">
+                                        <div className="col-md-6 product_img">
+                                            <img
+                                                src={book.book.image_path}
+                                                className="img-responsive"
+                                                width={400}
+                                                onError={({
+                                                    currentTarget,
+                                                }) => {
+                                                    currentTarget.onerror =
+                                                        null; // prevents looping
+                                                    currentTarget.src =
+                                                        "https://cdn-icons-png.flaticon.com/512/3845/3845824.png";
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="col-md-6 product_content px-4 py-3 rounded-lg">
+                                            <h1 className="h1">
+                                                {book && book.book.name
+                                                    ? book.book.name
+                                                    : ""}
+                                            </h1>
+                                            <p className="isbn_no specifications">
+                                                <span>ISBN No: </span>{" "}
+                                                {book && book.book.isbn
+                                                    ? book.book.isbn
+                                                    : "N/A"}
+                                            </p>
 
-                                <div className="row">
-                                    <div className="col-md-6 product_img">
-                                        <img
-                                            src={
-                                                book && book.book.image_path
-                                                    ? book.book.image_path
-                                                    : "https://cdn-icons-png.flaticon.com/512/3845/3845824.png"
-                                            }
-                                            className="img-responsive"
-                                            width={400}
-                                        />
-                                    </div>
-                                    <div className="col-md-6 product_content px-4 py-3 rounded-lg">
-                                        <h1 className="h1">
-                                            {book && book.book.name
-                                                ? book.book.name
-                                                : ""}
-                                        </h1>
-                                        <p className="isbn_no specifications">
-                                            <span>ISBN No: </span>{" "}
-                                            {book && book.book.isbn
-                                                ? book.book.isbn
-                                                : ""}
-                                        </p>
+                                            <p className="author_name specifications">
+                                                <span>Author: </span>{" "}
+                                                <>
+                                                    {book &&
+                                                    book.book.authors[0]
+                                                        .first_name &&
+                                                    book.book.authors[0]
+                                                        .last_name
+                                                        ? book.book.authors[0]
+                                                              .first_name +
+                                                          " " +
+                                                          book.book.authors[0]
+                                                              .last_name
+                                                        : ""}
+                                                </>
+                                            </p>
+                                            <p className="author_name specifications">
+                                                <span>Format: </span>{" "}
+                                                {book.format === 1
+                                                    ? "Hardcover"
+                                                    : book.format === 2
+                                                    ? "Paperback"
+                                                    : "E-Book"}
+                                            </p>
 
-                                        <p className="author_name specifications">
-                                            <span>Author: </span>{" "}
-                                            {book &&
-                                            book.book.authors[0].first_name &&
-                                            book.book.authors[0].last_name
-                                                ? book.book.authors[0]
-                                                      .first_name +
-                                                  " " +
-                                                  book.book.authors[0].last_name
-                                                : ""}
-                                        </p>
-                                        <p className="author_name specifications">
-                                            <span>Format: </span>{" "}
-                                            {book.format === 1
-                                                ? "Hardcover"
-                                                : book.format === 2
-                                                ? "Paperback"
-                                                : "E-Book"}
-                                        </p>
-                                        <p className="author_name specifications">
-                                            <span>Edition: </span>{" "}
-                                            {book.edition}
-                                        </p>
-                                        <p className="author_name specifications">
-                                            <span>Genre: </span>
-                                            {book.book?.genres?.length
-                                                ? book.book.genres[0].name
-                                                : ""}
-                                        </p>
-                                        <p className="author_name specifications">
-                                            <span>Belongs To: </span>
-                                            {book?.book?.library_id === 111 ? (
-                                                <span className="badge badge-danger">
-                                                    Dindayal Upadhyay Digital
-                                                    Library
-                                                </span>
-                                            ) : book?.book?.library_id ===
-                                              222 ? (
-                                                <span className="badge badge-danger">
-                                                    Kundanlal Gupta Digital
-                                                    Library
-                                                </span>
-                                            ) : (
-                                                <span className="badge badge-danger">
-                                                    Rashtramata Kasturba Digital
-                                                    Library
-                                                </span>
-                                            )}
-                                        </p>
-                                        <p className="description">
-                                            {book && book.book.description
-                                                ? book.book.description
-                                                : ""}
-                                        </p>
+                                            <p className="author_name specifications">
+                                                <span>Edition: </span>{" "}
+                                                {book.edition
+                                                    ? book.edition
+                                                    : "N/A"}
+                                            </p>
+                                            <p className="author_name specifications">
+                                                <span>Genre: </span>
+                                                {book.book?.genres?.length
+                                                    ? book.book.genres[0].name
+                                                    : ""}
+                                            </p>
+                                            <p className="author_name specifications">
+                                                <span>Publisher: </span>
+                                                {book.publisher?.name}
+                                            </p>
 
-                                        {/* <button
-                                            type="button"
-                                            className={`frontend-btn ${
-                                                ebookSub &&
-                                                moment(
-                                                    ebookSub.returned_on
-                                                ).format("YYYY-MM-DD") <
-                                                    moment().format(
-                                                        "YYYY-MM-DD"
-                                                    )
-                                                    ? "btn-danger"
-                                                    : "btn-warning"
-                                            }`}
-                                            disabled={
-                                                !isAvailable ||
-                                                (ebookSub &&
-                                                    moment(
-                                                        ebookSub.returned_on
-                                                    ).format("YYYY-MM-DD") >
-                                                        moment().format(
-                                                            "YYYY-MM-DD"
-                                                        ))
-                                                    ? true
-                                                    : false
-                                            }
-                                            onClick={() =>
-                                                handleSubscribe(book.id)
-                                            }
-                                        >
-                                            <span>
-                                                {" "}
-                                                {ebookSubscription.length > 0 &&
-                                                ebookSub &&
-                                                !(
+                                            <p className="author_name specifications">
+                                                <span>Belongs To: </span>
+                                                <div className="publisher">
+                                                    <select
+                                                        defaultValue={
+                                                            book?.book
+                                                                ?.library_id
+                                                        }
+                                                        className="form-select"
+                                                        aria-label="Select Library."
+                                                        onChange={
+                                                            libraryOnChange
+                                                        }
+                                                    >
+                                                        {libraryStatus.length ? (
+                                                            libraryStatus.map(
+                                                                (
+                                                                    library,
+                                                                    i
+                                                                ) => {
+                                                                    return (
+                                                                        <option
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                            value={
+                                                                                library.value
+                                                                            }
+                                                                            disabled={
+                                                                                !isDisabled[
+                                                                                    i
+                                                                                ]
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                library.label
+                                                                            }
+                                                                        </option>
+                                                                    );
+                                                                }
+                                                            )
+                                                        ) : (
+                                                            <option value="">
+                                                                No records
+                                                                found.
+                                                            </option>
+                                                        )}
+                                                    </select>
+                                                </div>
+                                            </p>
+                                            <p className="description">
+                                                {book && book.book.description
+                                                    ? book.book.description
+                                                    : ""}
+                                            </p>
+                                            <button
+                                                type="button"
+                                                className={`frontend-btn ${
+                                                    ebookSub &&
                                                     moment(
                                                         ebookSub.returned_on
                                                     ).format("YYYY-MM-DD") <
-                                                    moment().format(
-                                                        "YYYY-MM-DD"
+                                                        moment().format(
+                                                            "YYYY-MM-DD"
+                                                        )
+                                                        ? "btn-danger"
+                                                        : "btn-warning"
+                                                }`}
+                                                disabled={
+                                                    !isAvailable ||
+                                                    (ebookSub?.library_id ==
+                                                        book?.book
+                                                            ?.library_id &&
+                                                        moment(
+                                                            ebookSub.returned_on
+                                                        ).format("YYYY-MM-DD") >
+                                                            moment().format(
+                                                                "YYYY-MM-DD"
+                                                            ))
+                                                        ? true
+                                                        : false
+                                                }
+                                                onClick={() =>
+                                                    handleSubscribe(
+                                                        book.id,
+                                                        book.book.library_id
                                                     )
-                                                )
-                                                    ? "Ebook is Subscribed"
-                                                    : ebookSub &&
-                                                      moment(
-                                                          ebookSub.returned_on
-                                                      ).format("YYYY-MM-DD") <
-                                                          moment().format(
+                                                }
+                                            >
+                                                <span>
+                                                    {" "}
+                                                    {ebookSubscription.length &&
+                                                    ebookSub?.library_id ==
+                                                        book?.book
+                                                            ?.library_id &&
+                                                    !(
+                                                        moment(
+                                                            ebookSub.returned_on
+                                                        ).format("YYYY-MM-DD") <
+                                                        moment().format(
+                                                            "YYYY-MM-DD"
+                                                        )
+                                                    )
+                                                        ? "Ebook is Subscribed"
+                                                        : ebookSub &&
+                                                          moment(
+                                                              ebookSub.returned_on
+                                                          ).format(
                                                               "YYYY-MM-DD"
-                                                          )
-                                                    ? "Book is Expired want to Renew"
-                                                    : isAvailable
-                                                    ? "Subscribe"
-                                                    : "Unavailable"}
-                                            </span>
-                                        </button> */}
-                                        <a
-                                            target="_blank"
-                                            href={
-                                                book?.book?.library_id === 111
-                                                    ? "https://dindayalupadhyay.smartcitylibrary.com/" +
-                                                      location.href.slice(
-                                                          location.href.lastIndexOf(
-                                                              "#"
-                                                          )
-                                                      )
-                                                    : book?.book?.library_id ===
-                                                      222
-                                                    ? "https://kundanlalgupta.smartcitylibrary.com/" +
-                                                      location.href.slice(
-                                                          location.href.lastIndexOf(
-                                                              "#"
-                                                          )
-                                                      )
-                                                    : "https://rashtramatakasturba.smartcitylibrary.com/" +
-                                                      location.href.slice(
-                                                          location.href.lastIndexOf(
-                                                              "#"
-                                                          )
-                                                      )
-                                            }
-                                            className="frontend-btn"
-                                        >
-                                            {book.format == 3
-                                                ? "Subscribe"
-                                                : "Reserve"}
-                                        </a>
-                                        {(ebookSub || ebookSub?.length > 0) &&
-                                        moment(ebookSub.returned_on).format(
-                                            "YYYY-MM-DD"
-                                        ) > moment().format("YYYY-MM-DD") &&
-                                        book.pdf_preview_file ? (
-                                            <button
-                                                type="button"
-                                                className="frontend-btn ml-3 btn btn-info"
-                                                // onClick={() =>
-                                                //     !book.format === 3
-                                                //         ? toggle()
-                                                //         : (location.hash =
-                                                //               "/view-book/" +
-                                                //               book.id)
-                                                // }
-                                                onClick={() => {
-                                                    book.format === 3
-                                                        ? (location.hash =
-                                                              "/view-book/" +
-                                                              book.file_name)
-                                                        : toggle();
-                                                }}
-                                            >
-                                                <span> Read</span>
+                                                          ) <
+                                                              moment().format(
+                                                                  "YYYY-MM-DD"
+                                                              )
+                                                        ? "Book is Expired want to Renew"
+                                                        : isAvailable
+                                                        ? "Subscribe"
+                                                        : "Unavailable"}
+                                                </span>
                                             </button>
-                                        ) : null}
-                                        {/* {book.pdf_preview_file && (
-                                            <button
-                                                type="button"
-                                                className="ml-3 frontend-btn btn btn-info"
-                                                onClick={() => toggle()}
-                                            >
-                                                <span>PDF Preview</span>
-                                            </button>
-                                        )} */}
+                                            {(ebookSub ||
+                                                ebookSub?.length > 0) &&
+                                            moment(ebookSub.returned_on).format(
+                                                "YYYY-MM-DD"
+                                            ) > moment().format("YYYY-MM-DD") &&
+                                            book.pdf_preview_file ? (
+                                                <button
+                                                    type="button"
+                                                    className="frontend-btn ml-3 btn btn-info"
+                                                    onClick={() => {
+                                                        book.format === 3
+                                                            ? (location.hash =
+                                                                  "/view-book/" +
+                                                                  book.file_name)
+                                                            : toggle();
+                                                    }}
+                                                >
+                                                    <span> Read</span>
+                                                </button>
+                                            ) : null}
+                                            {book.pdf_preview_file && member && (
+                                                <button
+                                                    type="button"
+                                                    className="ml-3 frontend-btn btn btn-info"
+                                                    onClick={() => toggle()}
+                                                >
+                                                    <span>Preview</span>
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ) : null;
-                    })
+                            ) : null;
+                        })
+                    ) : (
+                        <p className="specifications mx-auto">
+                            <span>
+                                {getFormattedMessage(
+                                    "books.table.book-un-available.column"
+                                )}
+                            </span>
+                        </p>
+                    )
                 ) : (
                     <div className="spinner">
                         <img src="/public/images/301.gif" />
                     </div>
                 )}
-
-                <PDFviewerModal {...pdfModalOptions} />
+                <PDFviewerModal {...pdfModalOptions} libraryId={libraryId} />
             </section>
         </div>
     );
@@ -449,9 +520,9 @@ const BookDetails = (props) => {
 
 function EbookDetails(props) {
     const {
-        fetchBooksAll,
-        fetchSubscriptionLimit,
         books,
+
+        fetchSubscriptionLimit,
         reserveBook,
         findBooksWithout,
         searchBooks,
@@ -464,57 +535,65 @@ function EbookDetails(props) {
         isMemberRegistered,
         fetchMemberStatus,
         registerMemberToLibrary,
+        latestBooks,
+        fetchLatestBooks,
     } = props;
     const params = useParams();
     const { id, library_id } = params;
     const navigate = useNavigate();
     const member = getCurrentMember();
     const [isAvailable, setIsAvailable] = useState(true);
+    const [filteredBook, setFilteredBook] = useState([]);
+    const [libraryId, setLibraryId] = useState(library_id);
+    const [formatId, setFormatId] = useState("");
+    const [isDisabled, setIsDisabled] = useState([]);
+    const [isFormatDisabled, setIsFormatDisabled] = useState([]);
+    const location = useLocation();
     const goTo = (url) => {
         navigate(url);
     };
 
     const dispatch = useDispatch();
 
-    const handleSubscribe = (id) => {
-        // if (member) {
-        //     if (member.subscription) {
-        //         const isRegistered = isMemberRegistered.length
-        //             ? isMemberRegistered.some(
-        //                   (item) => item.user_library_id == library_id
-        //               )
-        //             : false;
-        //         console.log({ isRegistered });
-        //         if (member.user_library_id != library_id && !isRegistered) {
-        //             toggleModal();
-        //         } else {
-        //             navigate("/lms/ebook-subscription/" + id);
-        //         }
-        //     }
-        // } else if (!isAvailable) {
-        //     dispatch(
-        //         addToast({
-        //             text: "Ebook is Unavailable.",
-        //             type: toastType.ERROR,
-        //         })
-        //     );
-        // } else {
-        //     navigate("/lms/login");
-        //     dispatch(
-        //         addToast({
-        //             text: "UnAuthenticated",
-        //             type: toastType.ERROR,
-        //         })
-        //     );
-        // }
-        location.href =
-            "https://elibrary.veerit.com/" +
-            location.href.slice(location.href.lastIndexOf("#"));
-    };
+    const handleSubscribe = useCallback(
+        (id, libraryId) => {
+            if (member) {
+                if (member.subscription) {
+                    const isRegistered = isMemberRegistered.length
+                        ? isMemberRegistered.some(
+                              (item) => item.user_library_id == libraryId
+                          )
+                        : false;
+                    if (member.user_library_id != libraryId && !isRegistered) {
+                        toggleModal();
+                    } else {
+                        navigate(
+                            "/lms/ebook-subscription/" + id + "/" + libraryId
+                        );
+                    }
+                }
+            } else if (!isAvailable) {
+                dispatch(
+                    addToast({
+                        text: "Ebook is Unavailable.",
+                        type: toastType.ERROR,
+                    })
+                );
+            } else {
+                navigate("/lms/login");
+                dispatch(
+                    addToast({
+                        text: "Please Login",
+                        type: toastType.ERROR,
+                    })
+                );
+            }
+        },
+        [libraryId, isMemberRegistered]
+    );
 
     useEffect(() => {
         fetchEbookSubscription();
-        fetchBooksAll();
         if (!_.isEmpty(member)) {
             if (member.subscription) {
                 fetchBooksHistory({
@@ -551,17 +630,17 @@ function EbookDetails(props) {
         // }
 
         window.scroll({ top: 0, behavior: "smooth" });
-    }, [reserveBook]);
+    }, [reserveBook, library_id, id]);
 
     useEffect(() => {
         fetchSubscriptionLimit();
         if (member) fetchMemberStatus(member.id);
     }, []);
 
-    const handleFurtherReservation = () => {
-        registerMemberToLibrary(member, library_id);
+    const handleFurtherReservation = useCallback(() => {
+        registerMemberToLibrary(member, libraryId);
         toggleModal();
-    };
+    }, [libraryId]);
 
     const staffOptions = {
         goTo,
@@ -583,18 +662,65 @@ function EbookDetails(props) {
         isAvailable,
         setIsAvailable,
         toggleModal,
+        libraryId,
+        setLibraryId,
+        filteredBook,
+        isDisabled,
+        isFormatDisabled,
     };
 
-    // console.log({ searchBooks });
     const content = `These book belongs to ${
-        library_id
-            ? libraryStatus.find((status) => status.id == library_id).name
+        libraryId
+            ? libraryStatus.find((status) => status.id == libraryId)?.name
             : "N/A"
     } Library. And Your are not the Member either. Do you want to Register for ${
-        library_id
-            ? libraryStatus.find((status) => status.id == library_id).name
+        libraryId
+            ? libraryStatus.find((status) => status.id == libraryId)?.name
             : "N/A"
     } and Continue ?`;
+
+    useEffect(() => {
+        if (searchBooks.length) {
+            let tempBooks = [];
+            if (libraryId) {
+                tempBooks = searchBooks.filter(
+                    (book) => book.book.library_id === parseInt(libraryId)
+                );
+                setFilteredBook(tempBooks);
+            }
+
+            const tempIsDisabled = libraryStatus.map((status, i) =>
+                searchBooks.find(
+                    (book, i) => book?.book?.library_id == status.id
+                )
+                    ? true
+                    : false
+            );
+            setIsDisabled(tempIsDisabled);
+
+            const tempFormatIsDisabled = [
+                {
+                    id: 1,
+                    name: "Hardcover",
+                },
+                {
+                    id: 2,
+                    name: "Paperback",
+                },
+                {
+                    id: 3,
+                    name: "E-Book",
+                },
+            ].map((format, i) =>
+                searchBooks.find((book, i) => book?.format == format.id)
+                    ? true
+                    : false
+            );
+
+            setIsFormatDisabled(tempFormatIsDisabled);
+        }
+    }, [location.pathname, libraryId, searchBooks, formatId]);
+
     return (
         <div>
             {" "}
@@ -620,12 +746,12 @@ function EbookDetails(props) {
 
 const mapStateToProps = (state) => {
     const {
-        books,
         searchBooks,
         bookHistory,
         ebookSubscription,
         subscriptionLimit,
-        isRegistered,
+        isMemberRegistered,
+        books,
     } = state;
     return {
         books,
@@ -633,12 +759,11 @@ const mapStateToProps = (state) => {
         bookHistory,
         ebookSubscription,
         subscriptionLimit,
-        isRegistered,
+        isMemberRegistered,
     };
 };
 
 export default connect(mapStateToProps, {
-    fetchBooksAll,
     findBooksWithout,
     reserveBook,
     fetchBooksHistory,

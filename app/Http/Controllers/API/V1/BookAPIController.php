@@ -71,9 +71,10 @@ class BookAPIController extends AppBaseController
         }
 
 
+        $uniqueBooks = collect($filteredArray)->unique('name')->values()->all();
 
 
-        return $this->sendResponse($filteredArray, 'Books retrieved successfully.');
+        return $this->sendResponse($uniqueBooks, 'Books retrieved successfully.');
     }
 
 

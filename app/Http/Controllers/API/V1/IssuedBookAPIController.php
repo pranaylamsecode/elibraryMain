@@ -140,7 +140,6 @@ class IssuedBookAPIController extends AppBaseController
         $total = count($records) + count($records2) + count($records3);
         return $this->sendResponse(
             $records,
-            'Books history retrieved successfully.',
             ['totalRecords' => $total]
         );
     }

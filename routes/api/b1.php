@@ -171,6 +171,12 @@ Route::middleware(['auth:sanctum', 'user.auth'])->group(function () {
     // get e-books
     Route::get('b1/e-books', [BookAPIController::class, 'getEBooks'])->name('e-books');
 
+    Route::get('b1/e-books2', [BookAPIController::class, 'getEBooks2']);
+
+    Route::get('b1/subscribe-ebook', [BookAPIController::class, 'show2']);
+
+
+
     // Users
     // Route::middleware('permission:manage_users')->group(function () {
     //     Route::resource('b1/users', UserAPIElibraryController::class);

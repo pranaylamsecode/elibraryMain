@@ -9,6 +9,11 @@ mix.options({
 mix.setPublicPath("public");
 
 mix.webpackConfig({
+    devServer: {
+        historyApiFallback: true,
+        contentBase: "./",
+        hot: true,
+    },
     resolve: {
         extensions: [".js", ".jsx"],
         alias: {

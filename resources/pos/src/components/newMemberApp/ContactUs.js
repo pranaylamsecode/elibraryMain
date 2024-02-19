@@ -78,9 +78,7 @@ function ContactUs(props) {
         }
     };
 
-
     return (
-
         <div className="content-wrapper">
             <ProgressBar />
             <Header />
@@ -190,8 +188,12 @@ function ContactUs(props) {
                                     </li>
                                     <li>
                                         <span>PHONE:</span>
-                                        <a href="tel:+918981055565">
-                                            (+91) 898 105 5565
+                                        <a href="tel:+9194228092">
+                                            +91 94228092
+                                        </a>{" "}
+                                        ,
+                                        <a href="tel:+919834467686">
+                                            +91 9834467686
                                         </a>
                                     </li>
                                     <li>

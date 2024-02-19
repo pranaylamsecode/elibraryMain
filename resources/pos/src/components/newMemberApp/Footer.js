@@ -16,7 +16,9 @@ const Footer = () => {
                         />
                         <div className="pt-2">
                             <p className=" m-0"> info@digitallibrary.com</p>
-                            <p className=" m-0"> (+91) 898 105 5565</p>
+                            <p className=" m-0">
+                                <a href="tel:+918981055565">+91898105556</a>
+                            </p>
                         </div>
                     </div>
 
@@ -76,16 +78,20 @@ const Footer = () => {
                         </h5>
                         <p className="m-0">Incharge :- Manjushree Kanhere </p>
                         <p className="m-0 pb-2">
-                            Contact no : 9422880817,8007381362
+                            Contact no :
+                            <a href="tel:+9422880817">+91 9422880817</a> ,
+                            <a href="tel:+8007381362">+91 8007381362</a>
                         </p>
                     </div>
                     <div className="px-4 col-md-4 col-sm-12">
                         <h5 className="pb-2">
                             स्व. कुंदनलाल गुप्त वाचनालय,इमामवाडा
                         </h5>
-                        <p className="m-0">Incharge :- Manjushree Kanhere </p>
+                        <p className="m-0">Incharge :- Vijay Khobragade</p>
                         <p className="m-0 pb-2">
-                            Contact no : 9422880817,8007381362
+                            Contact no :
+                            <a href="tel:+9194228092">+91 94228092</a> ,
+                            <a href="tel:+919834467686">+91 9834467686</a>
                         </p>
                     </div>
                     <div className="px-4 col-md-4 col-sm-12">

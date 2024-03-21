@@ -80,9 +80,9 @@ function Terms() {
                         <p>
                             To report abuse regarding copyrighted books on the
                             E-Library portal, don't hesitate to contact us at
-                            admin@smartcitylibrary.com. We will thoroughly
-                            investigate all reports of abuse and take
-                            appropriate actions in accordance with the law.
+                            info@educron.com,info@createonlineacademy.com. We
+                            will thoroughly investigate all reports of abuse and
+                            take appropriate actions in accordance with the law.
                         </p>
                         <p>
                             By accessing and using the E-Library portal, users

@@ -15,10 +15,13 @@ const Footer = () => {
                             width={150}
                         />
                         <div className="pt-2">
-                            <p className=" m-0"> info@digitallibrary.com</p>
                             <p className=" m-0">
-                                <a href="tel:+918981055565">+91898105556</a>
+                                {" "}
+                                info@educron.com , info@createonlineacademy.com
                             </p>
+                            {/* <p className=" m-0">
+                                <a href="tel:+918981055565">+91898105556</a>
+                            </p> */}
                         </div>
                     </div>
 

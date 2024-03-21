@@ -21,7 +21,6 @@ function Terms() {
             <Header />
             <section className="term_section">
                 <div className="container">
-
                     <div className="terms">
                         <h2>Terms of Usage</h2>
                         <p>
@@ -108,11 +107,10 @@ function Terms() {
                         <p>
                             <b>Governing Law</b> <br />
                             These terms and conditions shall be governed by and
-                            construed in accordance with the laws of [insert
-                            jurisdiction]. Any disputes arising out of or in
-                            connection with these terms and conditions shall be
-                            resolved in accordance with the laws of [insert
-                            jurisdiction].
+                            construed in accordance with the laws of India. Any
+                            disputes arising out of or in connection with these
+                            terms and conditions shall be resolved in accordance
+                            with the laws of India.
                         </p>
                         <p>
                             <b>Modification of Terms and Conditions</b> <br />

@@ -198,7 +198,10 @@ function ContactUs(props) {
                                     </li>
                                     <li>
                                         <span>EMAIL:</span>
-                                        <a href="/">info@digitallibrary.com</a>
+                                        <a href="/">
+                                            info@educron.com ,
+                                            info@createonlineacademy.com
+                                        </a>
                                     </li>
                                 </ul>
                                 <h4>Reach out to us on social media</h4>

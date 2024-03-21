@@ -83,7 +83,7 @@ function Privacy_policy() {
                             <b>Contact Us</b> <br />
                             If you have any questions or concerns about this
                             privacy policy, please contact us at
-                            info@digitallibrary.com
+                            info@educron.com, info@createonlineacademy.com
                         </p>
                     </div>
                 </div>

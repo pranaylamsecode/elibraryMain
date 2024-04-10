@@ -24,7 +24,7 @@ function About(props) {
                             <div className="section-title-center text-center">
                                 <span>ABOUT E-LIBRARY</span>
                                 <h2 className="display-6">
-                                    Learn about the E-library
+                                    Nagpur Digital Library
                                 </h2>
                                 <div className="section-divider divider-traingle"></div>
                             </div>
@@ -40,35 +40,9 @@ function About(props) {
                             <div className="authorv2__image">
                                 <img
                                     className="img-fluid"
-                                    src="images/achive.png"
+                                    src="public/uploads/images/achive.png"
                                     alt="Author"
                                 />
-                                <a
-                                    className="glightbox3 video-btn"
-                                    data-toggle="modal"
-                                    data-target="#exampleModalCenter"
-                                >
-                                    <svg
-                                        stroke="currentColor"
-                                        fill="none"
-                                        strokeWidth="2"
-                                        viewBox="0 0 24 24"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        height="1em"
-                                        width="1em"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                    </svg>
-                                </a>
-                                <div className="promo-video">
-                                    <div className="waves-block">
-                                        <div className="waves wave-1"></div>
-                                        <div className="waves wave-2"></div>
-                                        <div className="waves wave-3"></div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         <div
@@ -78,35 +52,120 @@ function About(props) {
                             data-aos-delay="200"
                         >
                             <p>
-                                Welcome to our e-library web portal! We are a
-                                team of passionate individuals dedicated to
-                                providing you with the best possible online and
-                                physical library experience. Our goal is to make
-                                it easy and convenient for you to access an
-                                extensive collection of digital books,
-                                magazines, journals, and other educational
-                                resources from the comfort of your own home or
-                                in person at our physical location.
+                                Welcome to the Master Portal, your gateway to a
+                                world of knowledge, exploration, and infinite
+                                learning possibilities. As a pioneering digital
+                                platform, we proudly connect you to the
+                                Kundanlal Gupta Library, Rashtramata Kasturba
+                                Library, and Dindayal Upadhyay Library. Each of
+                                these esteemed E-Libraries is dedicated to
+                                providing access to a vast repository of digital
+                                resources, including a wide array of e-books,
+                                eResources, and comprehensive catalogues of
+                                physical books, ensuring that our members have
+                                the best of both worlds at their fingertips.
+                            </p>
+                            <h4>Our Vision</h4>
+                            <p>
+                                We believe in democratizing access to
+                                information and fostering a love for lifelong
+                                learning. By integrating the digital and
+                                physical realms of these libraries, we aim to
+                                create a seamless and enriching experience for
+                                all our members, enabling them to delve into the
+                                depths of knowledge from the comfort of their
+                                homes or on the go.
+                            </p>
+                            <h4>Features and Services</h4>
+                            <li>
+                                <ul>
+                                    <strong>Comprehensive Access</strong>:
+                                    <p>
+                                        Through the Master Portal, members gain
+                                        access to the individual portals of
+                                        Kundanlal Gupta Library, Rashtramata
+                                        Kasturba Library, and Dindayal Upadhyay
+                                        Library. Each portal is a treasure trove
+                                        of digital content, including thousands
+                                        of e-books and eResources, along with a
+                                        detailed catalogue of physical books.
+                                    </p>
+                                </ul>
+                                <ul>
+                                    <strong>
+                                        Seamless Registration and Payment
+                                    </strong>
+                                    :
+                                    <p>
+                                        Membership to these libraries is made
+                                        easy with our online registration and
+                                        payment system. Prospective members can
+                                        sign up and pay their library fees
+                                        through a streamlined digital process,
+                                        welcoming them into our community of
+                                        avid learners.
+                                    </p>
+                                </ul>
+                                <ul>
+                                    <strong>
+                                        Book Reservation and Circulation
+                                    </strong>
+                                    :{" "}
+                                    <p>
+                                        We&#39;ve embraced technology to make
+                                        discovering and reserving physical books
+                                        as effortless as scrolling through your
+                                        device. Our digitized library management
+                                        and computerized book circulation
+                                        systems ensure that you can easily
+                                        search for, find, and reserve books
+                                        online.
+                                    </p>
+                                </ul>
+                                <ul>
+                                    <strong>
+                                        Membership Cards with Barcode
+                                    </strong>
+                                    :{" "}
+                                    <p>
+                                        In our quest to blend convenience with
+                                        efficiency, we request all our members
+                                        to collect their membership cards
+                                        equipped with a unique barcode. This
+                                        barcode is essential for issuing books,
+                                        symbolizing a key that unlocks endless
+                                        realms of knowledge.
+                                    </p>
+                                </ul>
+                            </li>
+                            <h4>Our Commitment</h4>
+                            <p>
+                                At the heart of our mission is a commitment to
+                                enhancing user experience, simplifying access to
+                                information, and encouraging the pursuit of
+                                knowledge and education. The integration of
+                                these three distinguished libraries under one
+                                master portal exemplifies our dedication to
+                                creating a cohesive, comprehensive, and
+                                user-friendly digital environment for all our
+                                members.
+                            </p>
+                            <h4>Join Us</h4>
+                            <p>
+                                Embark on a journey of discovery and
+                                enlightenment with us. The Master Portal is more
+                                than just a platform; it&#39;s a community of
+                                curious minds, scholars, and lifelong learners.
+                                Register today and become part of a legacy of
+                                knowledge, innovation, and educational
+                                excellence.
                             </p>
                             <p>
-                                Our team is made up of experienced librarians,
-                                technologists of Educron, and content experts
-                                who have a deep understanding of the importance
-                                of education and learning. We believe that
-                                knowledge is the key to personal and
-                                professional growth, and we want to help you
-                                unlock your full potential through our platform
-                                and physical library.
+                                We look forward to welcoming you into our
+                                vibrant community and exploring the vast expanse
+                                of knowledge together.
                             </p>
-                            <p>
-                                We strive to ensure that our e-library is
-                                user-friendly, with an intuitive interface that
-                                allows you to easily search for and find the
-                                materials you need. Whether you're a student, a
-                                researcher, or simply someone who loves to read,
-                                we have something for you.
-                            </p>
-                            <div className="authorv2__content">
+                            {/* <div className="authorv2__content">
                                 <ul className="social-icon mt-3">
                                     <li>
                                         <a href="https://www.facebook.com">
@@ -154,7 +213,7 @@ function About(props) {
                                         </a>
                                     </li>
                                 </ul>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
@@ -196,7 +255,7 @@ function About(props) {
                     </div>
                 </div>
             </div>
-            <section
+            {/*  <section
                 id="author"
                 className="section-padding authorv2 author_section_2"
             >
@@ -266,8 +325,8 @@ function About(props) {
                         </div>
                     </div>
                 </div>
-            </section>
-            <section className="container">
+            </section> */}
+            {/*  <section className="container">
                 <div className="d-flex flex-column align-items-start">
                     <h1>Tag Line </h1>
                     <div className="d-flex flex-column align-items-center ml-5">
@@ -304,8 +363,8 @@ function About(props) {
                         knowledge of their choice
                     </p>
                 </div>
-            </section>
-            <section
+            </section> */}
+            {/* <section
                 id="achievements"
                 className="section-padding achievement bg-one"
             >
@@ -540,7 +599,7 @@ function About(props) {
                         </div>
                     </div>
                 </div>
-            </section>
+            </section> */}
             <section className="section-padding counters ">
                 <div className="container">
                     <div className="row">

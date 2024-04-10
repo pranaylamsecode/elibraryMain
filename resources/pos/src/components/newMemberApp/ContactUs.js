@@ -204,7 +204,7 @@ function ContactUs(props) {
                                         </a>
                                     </li>
                                 </ul>
-                                <h4>Reach out to us on social media</h4>
+                                {/* <h4>Reach out to us on social media</h4>
                                 <ul className="social-icon mt-3">
                                     <li>
                                         <a href="https://www.facebook.com">
@@ -261,7 +261,7 @@ function ContactUs(props) {
                                             />
                                         </a>
                                     </li>
-                                </ul>
+                                </ul> */}
                             </div>
                         </div>
                     </div>

@@ -24,7 +24,7 @@ function About(props) {
                             <div className="section-title-center text-center">
                                 <span>ABOUT E-LIBRARY</span>
                                 <h2 className="display-6">
-                                    Nagpur Digital Library
+                                    Smart Libraries for Smart Nagpur
                                 </h2>
                                 <div className="section-divider divider-traingle"></div>
                             </div>
